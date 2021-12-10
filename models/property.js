@@ -7,7 +7,7 @@ const PropertySchema = Schema({
 	address: { type: String },
 	city: { type: String },
 	state: { type: String },
-	zip: { type: Number },
+	zip: { type: String },
 	county: { type: String },
 	latitude: { type: Number },
 	longitude: { type: Number },
@@ -17,7 +17,7 @@ const PropertySchema = Schema({
 	city_council_district: { type: String },
 	fair_market_value: { type: Number },
 	total_units: { type: Number },
-	active: { type: String },
+	active: { type: Boolean },
 	upload_id: { type: String },
 	user_id: { type: String }
 });
