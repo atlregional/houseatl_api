@@ -1,0 +1,33 @@
+{
+	"name": "houseatl_api",
+	"version": "0.1.0",
+	"description": "API application to serve property and subsidy data to the House ATL dashboard application",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js",
+		"watch": "nodemon server.js",
+		"seed": "node seeds/seedDB.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/atlregional/houseatl_api.git"
+	},
+	"author": "ARC",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/atlregional/houseatl_api/issues"
+	},
+	"homepage": "https://github.com/atlregional/houseatl_api#readme",
+	"dependencies": {
+		"compression": "^1.7.4",
+		"dotenv": "^10.0.0",
+		"express": "^4.17.1",
+		"moment": "^2.29.1",
+		"mongoose": "^6.1.0",
+		"morgan": "^1.10.0"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.15"
+	}
+}
