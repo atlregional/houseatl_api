@@ -5,5 +5,6 @@ module.exports = {
 	Resident: require('./resident'),
 	Agency: require('./agency'),
 	Upload: require('./upload'),
-	Owner: require('./owner')
+	Owner: require('./owner'),
+	FundingSource: require('./fundingSource')
 };

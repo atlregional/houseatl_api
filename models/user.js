@@ -8,9 +8,13 @@ const UserSchema = Schema({
 	email: { type: String },
 	password: { type: String },
 	role: { type: String },
-	agency_id: { type: String },
+	activation_token: { type: String },
 	active: { type: Boolean },
-	organization: { type: String }
+	agency_id: { type: String },
+	organization: { type: String },
+	data: { type: String },
+	created_on: { type: Date, default: Date.now() },
+	updated_on: { type: Date, default: Date.now() }
 });
 
 module.exports = model('user', UserSchema);
