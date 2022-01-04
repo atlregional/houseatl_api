@@ -4,7 +4,6 @@ const SubsidySchema = Schema({
 	id: { type: String },
 	project_name: { type: String },
 	development_type: { type: String },
-	awarded_date: { type: String },
 	start_date: { type: String },
 	end_date: { type: String },
 	year_15: { type: String },
@@ -21,6 +20,7 @@ const SubsidySchema = Schema({
 	low_income_units: { type: Number },
 	property_id: { type: String },
 	user_id: { type: String },
+	funding_sources: [{ type: Object, ref: 'fundingSource' }],
 	created_on: { type: Date, default: Date.now() },
 	updated_on: { type: Date, default: Date.now() }
 });

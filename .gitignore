@@ -105,6 +105,7 @@ dist
 
 # Seeding
 seeds
+data/*
 
 # Code Editor Config
 .prettierignore

@@ -5,7 +5,6 @@ const UploadSchema = Schema({
 	upload_date: { type: Date },
 	original_filename: { type: Date },
 	new_filename: { type: String },
-	email: { type: String },
 	user_id: { type: String },
 	agency_id: { type: String },
 	created_on: { type: Date, default: Date.now() },
