@@ -42,6 +42,8 @@ module.exports = {
 			city: '12',
 			state: '13',
 			zip: '14',
+			longitude: '15',
+			latitude: '16',
 			county: '',
 			total_units: '28'
 		},

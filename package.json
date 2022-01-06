@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@googlemaps/google-maps-services-js": "^3.3.5",
 		"compression": "^1.7.4",
+		"csvtojson": "^2.0.10",
 		"dotenv": "^10.0.0",
 		"express": "^4.17.1",
 		"moment": "^2.29.1",
