@@ -1,12 +1,11 @@
 const { Client } = require('@googlemaps/google-maps-services-js');
 const mappings = require('../config/mappings');
 const apiKey = process.env.GOOGLE_API_KEY;
-console.log(apiKey);
 const client = new Client();
 const errors = { NoInfo: 0 };
 let partialMatch = false;
 
-const handleDataType = (type, value) => {
+const handleDataType = (type, value, agency) => {
 	if (!value) return '';
 
 	switch (type) {
@@ -14,37 +13,86 @@ const handleDataType = (type, value) => {
 			return value.toString();
 		case 'int':
 			return +value;
-		case 'datetime':
+		case 'date':
+			if (agency === 'Invest Atlanta') {
+				const dateArr = value.split('-');
+				return new Date(`${dateArr[0]}-01-${dateArr[1]}`);
+			}
 			return new Date(value);
 		default:
-			return value;
+			return value.toString();
 	}
 };
 
-const createCollectionObj = (values, org, type) => {
-	const mapping =
-		org === 'NHPD'
-			? mappings['National Housing Preservation Database'][type]
-			: null;
+const calculateTotal = (item, value) => {
+	let total = 0;
+
+	value.forEach(key => {
+		if (item[key]) total += +item[key];
+	});
+
+	return total;
+};
+
+const createCollectionObj = (item, agency, type) => {
+	const mapping = mappings[agency][type];
 
 	const dataTypes = mappings['data_type_mapping'][type];
 
 	const obj = {};
 
-	Object.entries(mapping).forEach(([key, value]) =>
-		value
-			? (obj[key] = handleDataType(dataTypes[key], values[mapping[key]]))
-			: (obj[key] = '')
-	);
+	const fundingSourceArr =
+		agency === 'Invest Atlanta' && type === 'Funding_Source'
+			? [
+					'VINE CITY TRUST FUND',
+					'TAX EXEMPT BONDS',
+					'DOWNTOWN DEVELOPMENT AUTHORITY REVENUE BONDS',
+					'LEASE PURCHASE BONDS',
+					'HOMELESS OPPORTUNITY FUNDS',
+					'HOUSING OPPORTUNITY BONDS-MF',
+					'BELTLINE AFFORDABLE HOUSING TRUST FUND',
+					'HOME',
+					'WESTSIDE TAD',
+					'EASTSIDE TAD',
+					'CAMPBELLTON ROAD TAD',
+					'ML KING HOLLOWELL TAD ',
+					'CAMPBELLTON LAKEWOOD TAD'
+			  ]
+			: [];
+
+	// Key: key we want for db, Value: Header from file
+	Object.entries(mapping).forEach(([key, value]) => {
+		fundingSourceArr[0] &&
+		value &&
+		fundingSourceArr.includes(value) &&
+		item[mapping[key]]
+			? (obj[key] = handleDataType(
+					dataTypes[key],
+					item[mapping[key]] && item[mapping[key]].trim() !== '$-' ? value : '',
+					agency
+			  ))
+			: value && typeof value !== 'object'
+			? (obj[key] = handleDataType(dataTypes[key], item[mapping[key]], agency))
+			: value &&
+			  typeof value === 'object' &&
+			  agency === 'Invest Atlanta' &&
+			  type === 'Subsidy'
+			? (obj[key] = handleDataType(
+					dataTypes[key],
+					calculateTotal(item, value),
+					agency
+			  ))
+			: (obj[key] = '');
+	});
 	return obj;
 };
 
-const mapDataToObjs = async (org, values) => {
-	const Property = createCollectionObj(values, org, 'Property');
-	const Subsidy = createCollectionObj(values, org, 'Subsidy');
-	const Owner = createCollectionObj(values, org, 'Owner');
-	const Resident = createCollectionObj(values, org, 'Resident');
-	const FundingSource = createCollectionObj(values, org, 'Funding_Source');
+const mapDataToObjs = async (agency, data) => {
+	const Property = createCollectionObj(data, agency, 'Property');
+	const Subsidy = createCollectionObj(data, agency, 'Subsidy');
+	const Owner = createCollectionObj(data, agency, 'Owner');
+	const Resident = createCollectionObj(data, agency, 'Resident');
+	const FundingSource = createCollectionObj(data, agency, 'Funding_Source');
 
 	return { Property, Subsidy, Owner, Resident, FundingSource };
 };
@@ -145,32 +193,19 @@ const geocodeProperty = async ({
 	return obj;
 };
 
-const createDataObj = async (org, arr) => {
-	const obj = {};
+const createDataObj = async (agency, item) => {
+	const { Property, Subsidy, Owner, Resident, FundingSource } =
+		await mapDataToObjs(agency, item);
 
-	for await (const item of arr) {
-		const values = Object.values(item);
+	const geocodedObj = await geocodeProperty(Property);
 
-		if (values.includes('ATLANTA' || 'Atlanta')) {
-			const { Property, Subsidy, Owner, Resident, FundingSource } =
-				await mapDataToObjs(org, values);
+	// ! use empty geocodedObj to not use GoogleMaps API
+	// const geocodedObj = {};
 
-			const geocodedObj = await geocodeProperty(Property);
+	const propertyObj = { ...Property, ...geocodedObj };
 
-			const propertyObj = { ...Property, ...geocodedObj };
-
-			!obj[propertyObj.geocoded_address]
-				? (obj[propertyObj.geocoded_address] = {
-						Property: propertyObj,
-						Subsidy: [Subsidy],
-						Owner: Owner,
-						Resident: Resident,
-						FundingSource: FundingSource
-				  })
-				: obj[propertyObj.geocoded_address].Subsidy.push(Subsidy);
-		}
-	}
-	return obj;
+	// console.log({ propertyObj, Subsidy, Owner, Resident, FundingSource });
+	return { Property: propertyObj, Subsidy, Owner, Resident, FundingSource };
 };
 
 module.exports = createDataObj;

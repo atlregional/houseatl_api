@@ -37,24 +37,25 @@ module.exports = {
 	},
 	'National Housing Preservation Database': {
 		Property: {
-			name: '10',
-			original_address: '11',
-			city: '12',
-			state: '13',
-			zip: '14',
-			longitude: '15',
-			latitude: '16',
+			name: 'Property Name',
+			original_address: 'Street Address',
+			city: 'City',
+			state: 'State',
+			zip: 'Zip Code',
+			longitude: 'Longitude',
+			latitude: 'Latitude',
 			county: '',
-			total_units: '28'
+			total_units: 'Known Total Units',
+			active: 'Subsidy Status'
 		},
 		Owner: {
-			name: '17'
+			name: 'Owner Name'
 		},
 		Subsidy: {
-			project_name: '10',
-			development_type: '',
-			start_date: '7',
-			end_date: '8',
+			project_name: 'Property Name',
+			development_type: 'Construction Type',
+			start_date: 'Start Date',
+			end_date: 'End Date',
 			ami_30: '',
 			ami_50: '',
 			ami_60: '',
@@ -62,14 +63,14 @@ module.exports = {
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: '9'
+			low_income_units: 'Assisted Units'
 		},
 		Resident: {
-			type_1: '24',
+			type_1: 'Target Population',
 			type_2: ''
 		},
 		Funding_Source: {
-			source_1: '5',
+			source_1: 'Subsidy Name',
 			source_2: ''
 		}
 	},
@@ -146,37 +147,70 @@ module.exports = {
 
 	'Invest Atlanta': {
 		Property: {
-			name: '0',
-			original_address: '4',
+			name: 'PROJECT',
+			original_address: 'ADDRESS',
 			city: '',
 			zip: '',
 			county: '',
-			total_units: '6'
+			total_units: '# OF UNITS'
 		},
 		Owner: {
-			name: '2'
+			name: 'OWNERSHIP ENTITY'
 		},
 		Subsidy: {
-			project_name: '0',
-			development_type: '34',
-			start_date: '5',
-			end_date: '31',
-			ami_30: '13',
-			ami_50: '18',
-			ami_60: '25',
-			ami_80: '30',
+			project_name: 'PROJECT',
+			development_type: 'CONSTRUCTION TYPE',
+			start_date: 'DATE CLOSED',
+			end_date: 'EFFECTIVE AFFORDABILITY END DATE',
+			ami_30: [
+				'STUDIO   30%AMI',
+				'1 BDRM          30% AMI',
+				'2 BDRM          30% AMI',
+				'3 BDRM          30% AMI',
+				'4 BDRM          30% AMI'
+			],
+			ami_50: [
+				'STUDIO   50%AMI',
+				'1 BDRM          50% AMI',
+				'2 BDRM          50% AMI',
+				'3 BDRM          50% AMI'
+			],
+			ami_60: [
+				'STUDIO   60%AMI',
+				'1 BDRM          60% AMI',
+				'2 BDRM          60% AMI',
+				'3 BDRM          60% AMI',
+				'4 BDRM          60% AMI'
+			],
+			ami_80: [
+				'STUDIO   80%AMI',
+				'1 BDRM          80% AMI',
+				'2 BDRM          80% AMI',
+				'3 BDRM          80% AMI'
+			],
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: '7'
+			low_income_units: '# OF AFFORDABLE UNITS'
 		},
 		Resident: {
-			type_1: '32',
-			type_2: '33'
+			type_1: 'TENANT TYPE',
+			type_2: 'CONSTRUCTION TYPE'
 		},
 		Funding_Source: {
-			source_1: '48',
-			source_2: '49'
+			source_1: 'VINE CITY TRUST FUND',
+			source_2: 'TAX EXEMPT BONDS',
+			source_3: 'DOWNTOWN DEVELOPMENT AUTHORITY REVENUE BONDS',
+			source_4: 'LEASE PURCHASE BONDS',
+			source_5: 'HOMELESS OPPORTUNITY FUNDS',
+			source_6: 'HOUSING OPPORTUNITY BONDS-MF',
+			source_7: 'BELTLINE AFFORDABLE HOUSING TRUST FUND',
+			source_8: 'HOME',
+			source_9: 'WESTSIDE TAD',
+			source_10: 'EASTSIDE TAD',
+			source_11: 'CAMPBELLTON ROAD TAD',
+			source_12: 'ML KING HOLLOWELL TAD',
+			source_13: 'CAMPBELLTON LAKEWOOD TAD'
 		}
 	},
 
@@ -187,7 +221,8 @@ module.exports = {
 			city: 'str',
 			zip: 'str',
 			county: 'str',
-			total_units: 'int'
+			total_units: 'int',
+			active: 'str'
 		},
 		Owner: {
 			name: 'str'
@@ -195,8 +230,8 @@ module.exports = {
 		Subsidy: {
 			project_name: 'str',
 			development_type: 'str',
-			start_date: 'datetime',
-			end_date: 'datetime',
+			start_date: 'date',
+			end_date: 'date',
 			ami_30: 'int',
 			ami_50: 'int',
 			ami_60: 'int',
