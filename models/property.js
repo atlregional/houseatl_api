@@ -3,7 +3,7 @@ const { Schema, model, SchemaTypes } = require('mongoose');
 const PropertySchema = Schema(
 	{
 		name: { type: String },
-		geocoded_address: { type: String },
+		address: { type: String },
 		original_address: { type: String },
 		city: { type: String },
 		state: { type: String },

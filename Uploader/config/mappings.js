@@ -198,19 +198,9 @@ module.exports = {
 			type_2: 'CONSTRUCTION TYPE'
 		},
 		Funding_Source: {
-			source_1: 'VINE CITY TRUST FUND',
-			source_2: 'TAX EXEMPT BONDS',
-			source_3: 'DOWNTOWN DEVELOPMENT AUTHORITY REVENUE BONDS',
-			source_4: 'LEASE PURCHASE BONDS',
-			source_5: 'HOMELESS OPPORTUNITY FUNDS',
-			source_6: 'HOUSING OPPORTUNITY BONDS-MF',
-			source_7: 'BELTLINE AFFORDABLE HOUSING TRUST FUND',
-			source_8: 'HOME',
-			source_9: 'WESTSIDE TAD',
-			source_10: 'EASTSIDE TAD',
-			source_11: 'CAMPBELLTON ROAD TAD',
-			source_12: 'ML KING HOLLOWELL TAD',
-			source_13: 'CAMPBELLTON LAKEWOOD TAD'
+			// No funding source data provided...
+			source_1: '',
+			source_2: ''
 		}
 	},
 

@@ -41,39 +41,12 @@ const createCollectionObj = (item, agency, type) => {
 
 	const obj = {};
 
-	const fundingSourceArr =
-		agency === 'Invest Atlanta' && type === 'Funding_Source'
-			? [
-					'VINE CITY TRUST FUND',
-					'TAX EXEMPT BONDS',
-					'DOWNTOWN DEVELOPMENT AUTHORITY REVENUE BONDS',
-					'LEASE PURCHASE BONDS',
-					'HOMELESS OPPORTUNITY FUNDS',
-					'HOUSING OPPORTUNITY BONDS-MF',
-					'BELTLINE AFFORDABLE HOUSING TRUST FUND',
-					'HOME',
-					'WESTSIDE TAD',
-					'EASTSIDE TAD',
-					'CAMPBELLTON ROAD TAD',
-					'ML KING HOLLOWELL TAD ',
-					'CAMPBELLTON LAKEWOOD TAD'
-			  ]
-			: [];
-
 	// Key: key we want for db, Value: Header from file
 	Object.entries(mapping).forEach(([key, value]) => {
-		fundingSourceArr[0] &&
-		value &&
-		fundingSourceArr.includes(value) &&
-		item[mapping[key]]
-			? (obj[key] = handleDataType(
-					dataTypes[key],
-					item[mapping[key]] && item[mapping[key]].trim() !== '$-' ? value : '',
-					agency
-			  ))
-			: value && typeof value !== 'object'
+		value && typeof value !== 'object'
 			? (obj[key] = handleDataType(dataTypes[key], item[mapping[key]], agency))
-			: value &&
+			: // ! Handles case where data has AMI split up into headers based on # of bedrooms
+			value &&
 			  typeof value === 'object' &&
 			  agency === 'Invest Atlanta' &&
 			  type === 'Subsidy'
@@ -186,7 +159,7 @@ const geocodeProperty = async ({
 		if (key) obj[key] = component['long_name'];
 	});
 
-	obj['geocoded_address'] = data['formatted_address'];
+	obj['address'] = data['formatted_address'];
 	obj['latitude'] = data['geometry']['location']['lat'];
 	obj['longitude'] = data['geometry']['location']['lng'];
 

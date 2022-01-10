@@ -49,7 +49,7 @@ const handleCollectionsInsert = async (
 	});
 
 	const existingProperty = await db.Property.findOne({
-		geocoded_address: Property.geocoded_address
+		address: Property.address
 	});
 
 	const dbProperty = !existingProperty

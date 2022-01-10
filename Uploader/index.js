@@ -20,13 +20,13 @@ const init = async ({
 		const fileType =
 			filename.split('.')[1] === 'csv'
 				? 'csv'
-				: filename.split('.')[1] === 'xlsx'
-				? 'xlsx'
+				: filename.split('.')[1] === 'xlsx' || filename.split('.')[1] === 'xls'
+				? 'excel'
 				: null;
 
 		const path = `./data/${directory}/${filename}`;
 
-		if (!sheet && fileType === 'xlsx') {
+		if (!sheet && fileType === 'excel') {
 			console.log('missing sheet arg');
 			process.exit(1);
 		}
@@ -34,7 +34,7 @@ const init = async ({
 		const agencyName =
 			directory === 'NHPD'
 				? 'National Housing Preservation Database'
-				: directory === 'Invest ATL'
+				: directory === 'InvestAtlanta'
 				? 'Invest Atlanta'
 				: '';
 
@@ -43,7 +43,7 @@ const init = async ({
 		const data =
 			fileType === 'csv'
 				? await csvToJSON(path)
-				: fileType === 'xlsx'
+				: fileType === 'excel'
 				? await xlsxToJSON(path, sheet, agencyName)
 				: [];
 

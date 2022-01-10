@@ -103,8 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
-# Seeding
-seeds
+# Data Files for Upload
 data/*
 
 # Code Editor Config
