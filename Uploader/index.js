@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 const mongoose = require('mongoose');
 const { xlsxToJSON, csvToJSON } = require('./utils/fileToJSON');
 const createDataObj = require('./utils/createDataObj');
@@ -6,6 +7,11 @@ const {
 	initializeDbUpload,
 	handleCollectionsInsert
 } = require('./utils/dbInteraction');
+
+const date = new Date(Date.now());
+const todaysDate = `${
+	date.getMonth() + 1
+}/${date.getDate()}/${date.getFullYear()}`;
 
 const init = async ({
 	directory: directory,
@@ -17,12 +23,12 @@ const init = async ({
 			console.log('missing directory and/or filename arg(s)');
 			process.exit(1);
 		}
-		const fileType =
-			filename.split('.')[1] === 'csv'
-				? 'csv'
-				: filename.split('.')[1] === 'xlsx' || filename.split('.')[1] === 'xls'
-				? 'excel'
-				: null;
+		const fileType = filename.split('.').includes('csv')
+			? 'csv'
+			: filename.split('.').includes('xlsx') ||
+			  filename.split('.').includes('xls')
+			? 'excel'
+			: null;
 
 		const path = `./data/${directory}/${filename}`;
 
@@ -36,6 +42,12 @@ const init = async ({
 				? 'National Housing Preservation Database'
 				: directory === 'InvestAtlanta'
 				? 'Invest Atlanta'
+				: directory === 'Atlanta Housing'
+				? 'Atlanta Housing'
+				: directory === 'DCA'
+				? 'Georgia Department of Community Affairs'
+				: directory === 'City of Atlanta'
+				? directory
 				: '';
 
 		if (!agencyName) throw new Error(`No Agency Case- ${directory}`);
@@ -53,12 +65,24 @@ const init = async ({
 		}
 
 		// ! Limiting Results for Testing -----------------------------
+		const cityFilter = (agency, item) => {
+			switch (agency) {
+				case 'Invest Atlanta':
+					return true;
+				case 'National Housing Preservation Database':
+					return item.City.toUpperCase() === 'ATLANTA';
+				case 'Atlanta Housing':
+					return item.CITY.toUpperCase() === 'ATLANTA';
+				case 'Georgia Department of Community Affairs':
+					return item.City.toUpperCase() === 'ATLANTA';
+				case 'City of Atlanta':
+					return true;
+				default:
+					return false;
+			}
+		};
 		const dataArr = data
-			.filter(
-				item =>
-					agencyName === 'Invest Atlanta' ||
-					item.City.toUpperCase() === 'ATLANTA'
-			)
+			.filter(item => cityFilter(agencyName, item))
 			.slice(0, 5);
 		// ! ----------------------------------------------------------
 
@@ -66,25 +90,49 @@ const init = async ({
 			process.env.user_id,
 			agencyName,
 			filename,
-			false
+			true
 		);
 
 		console.log(`Extracting data from ${dataArr.length} records...`);
+		const errorObj = {};
+
 		for await (const item of dataArr) {
-			const { Property, Subsidy, Owner, Resident, FundingSource } =
+			const { Property, Subsidy, Owner, Resident, FundingSource, Error } =
 				await createDataObj(agencyName, item);
 
-			// console.log({ Property, Subsidy, Owner, Resident, FundingSource });
+			if (!Error && Subsidy.start_date) {
+				// If no start_date front end throws an error due to project_name
+				// console.log({ Property, Subsidy, Owner, Resident, FundingSource });
+				await handleCollectionsInsert(userId, uploadId, {
+					Owner,
+					Property,
+					Subsidy,
+					FundingSource,
+					Resident
+				});
+				console.log('DB updated...');
+			} else if (!Error && !Subsidy.start_date) {
+				const obj = {
+					addressProvided: Property.address,
+					type: `No start date: ${Subsidy.project_name}`
+				};
 
-			await handleCollectionsInsert(userId, uploadId, {
-				Owner,
-				Property,
-				Subsidy,
-				FundingSource,
-				Resident
-			});
+				!errorObj[todaysDate]
+					? (errorObj[todaysDate] = [obj])
+					: errorObj[todaysDate].push(obj);
+			} else if (Error) {
+				!errorObj[todaysDate]
+					? (errorObj[todaysDate] = [Error])
+					: errorObj[todaysDate].push(Error);
+			}
 		}
-		console.log('DB updated...');
+
+		if (Object.keys(errorObj)[0]) {
+			const errorFilePath = `./Uploader/Errors/${agencyName}/errors.json`;
+			fs.writeFileSync(errorFilePath, JSON.stringify(errorObj));
+
+			console.log(`Errors Detected. See ${errorFilePath} for more info.`);
+		}
 	} catch (err) {
 		console.log(err);
 	}

@@ -2,11 +2,11 @@ const { Client } = require('@googlemaps/google-maps-services-js');
 const mappings = require('../config/mappings');
 const apiKey = process.env.GOOGLE_API_KEY;
 const client = new Client();
-const errors = { NoInfo: 0 };
+
 let partialMatch = false;
 
 const handleDataType = (type, value, agency) => {
-	if (!value) return '';
+	if (!value || value === ' - ') return '';
 
 	switch (type) {
 		case 'str':
@@ -15,10 +15,22 @@ const handleDataType = (type, value, agency) => {
 			return +value;
 		case 'date':
 			if (agency === 'Invest Atlanta') {
-				const dateArr = value.split('-');
-				return new Date(`${dateArr[0]}-01-${dateArr[1]}`);
+				const dateArr = value !== 'Under Construction' ? value.split('-') : [];
+
+				if (dateArr[0]) {
+					const month =
+						new Date(`${dateArr[0]}-01-20${dateArr[1]}`).getMonth() + 1;
+
+					return `${month}/01/20${dateArr[1]}`;
+				} else return value;
 			}
-			return new Date(value);
+
+			if (agency === 'Atlanta Housing' || agency === 'City of Atlanta') {
+				const dateArr = value.split('/');
+
+				return `${dateArr[0]}/${dateArr[1]}/20${dateArr[2]}`;
+			}
+			return value;
 		default:
 			return value.toString();
 	}
@@ -106,18 +118,31 @@ const clientHandler = async ({
 			partialMatch = true;
 			clientHandler({ name, original_address, city, zip, latitude, longitude });
 		} else if (data.results[0].partial_match && original_address) {
-			errors[original_address] = 'Partial Address Match';
-			return null;
+			return {
+				data: {
+					addressProvided: original_address,
+					type: 'Partial Address Match'
+				},
+				error: true
+			};
 		}
 
 		if (partialMatch) partialMatch = false;
 
-		return data.results[0];
+		return { data: data.results[0], error: false };
 	} else {
-		errors.NoInfo += 1;
-	}
+		const errorAddressStr = `name: ${name ? name : 'N/A'}, address: ${
+			original_address ? original_address : 'N/A'
+		}, city: ${city ? city : 'N/A'}, zip: ${zip ? zip : 'N/A'}`;
 
-	return null;
+		return {
+			data: {
+				providedAddress: errorAddressStr,
+				type: 'Geolocation error - Not enough Info'
+			},
+			error: true
+		};
+	}
 };
 
 const geocodeProperty = async ({
@@ -130,7 +155,7 @@ const geocodeProperty = async ({
 }) => {
 	const obj = {};
 
-	const data = await clientHandler({
+	const { data, error } = await clientHandler({
 		name,
 		original_address,
 		city,
@@ -139,46 +164,76 @@ const geocodeProperty = async ({
 		longitude
 	});
 
-	data['address_components'].forEach(component => {
-		let key = '';
-		switch (component['types'][0]) {
-			case 'locality':
-				key = 'city';
-				break;
-			case 'administrative_area_level_1':
-				key = 'state';
-				break;
-			case 'postal_code':
-				key = 'zip';
-				break;
-			case 'administrative_area_level_2':
-				key = 'county';
-			default:
-				break;
-		}
-		if (key) obj[key] = component['long_name'];
-	});
+	if (data && !error) {
+		data['address_components'].forEach(component => {
+			let key = '';
+			switch (component['types'][0]) {
+				case 'locality':
+					key = 'city';
+					break;
+				case 'administrative_area_level_1':
+					key = 'state';
+					break;
+				case 'postal_code':
+					key = 'zip';
+					break;
+				case 'administrative_area_level_2':
+					key = 'county';
+				default:
+					break;
+			}
+			if (key) obj[key] = component['long_name'];
+		});
 
-	obj['address'] = data['formatted_address'];
-	obj['latitude'] = data['geometry']['location']['lat'];
-	obj['longitude'] = data['geometry']['location']['lng'];
+		obj['address'] = data['formatted_address'];
+		obj['latitude'] = data['geometry']['location']['lat'];
+		obj['longitude'] = data['geometry']['location']['lng'];
 
-	return obj;
+		return { geocodedObj: obj, error: error };
+	} else if (data && error) {
+		return { geocodedObj: data, error: error };
+	} else if (!data) {
+		return {
+			geocodedObj: {
+				addressProvided: original_address,
+				type: 'Geolocation Error - Nothing returned from geolocation process'
+			},
+			error: true
+		};
+	}
 };
 
 const createDataObj = async (agency, item) => {
 	const { Property, Subsidy, Owner, Resident, FundingSource } =
 		await mapDataToObjs(agency, item);
 
-	const geocodedObj = await geocodeProperty(Property);
+	const { geocodedObj, error } = await geocodeProperty(Property);
 
 	// ! use empty geocodedObj to not use GoogleMaps API
 	// const geocodedObj = {};
+	// const error = false;
 
-	const propertyObj = { ...Property, ...geocodedObj };
+	if (!error) {
+		const propertyObj = { ...Property, ...geocodedObj };
 
-	// console.log({ propertyObj, Subsidy, Owner, Resident, FundingSource });
-	return { Property: propertyObj, Subsidy, Owner, Resident, FundingSource };
+		return {
+			Property: propertyObj,
+			Subsidy,
+			Owner,
+			Resident,
+			FundingSource,
+			Error: ''
+		};
+	} else {
+		return {
+			Property: '',
+			Subsidy: '',
+			Owner: '',
+			Resident: '',
+			FundingSource: '',
+			Error: geocodedObj
+		};
+	}
 };
 
 module.exports = createDataObj;

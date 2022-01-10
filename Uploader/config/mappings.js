@@ -1,37 +1,38 @@
 module.exports = {
 	'Atlanta Housing': {
 		Property: {
-			name: '0',
-			original_address: '2',
-			city: '3',
-			state: '4',
-			zip: '5',
+			name: 'COMMUNITY NAME',
+			original_address: 'ADDRESS',
+			city: 'CITY',
+			state: '',
+			zip: 'ZIP',
 			county: '',
-			total_units: '11'
+			total_units: '# OF AHA ASSISTED UNITS',
+			active: 'AGREEMENT STATUS'
 		},
 		Owner: {
-			name: '6'
+			name: ''
 		},
 		Subsidy: {
-			project_name: '0',
+			project_name: 'COMMUNITY NAME',
 			development_type: '',
-			start_date: '12',
-			end_date: '13',
+			start_date: 'CURRENT AGREEMENT EFFECTIVE DATE',
+			end_date: 'CURRENT AGREEMENT EXPIRATION DATE',
 			ami_30: '',
 			ami_50: '',
 			ami_60: '',
-			ami_80: '9',
+			ami_80: '',
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: '10'
+			low_income_units: '# OF AHA ASSISTED UNITS'
 		},
 		Resident: {
-			type_1: '1',
+			type_1: '',
 			type_2: ''
 		},
 		Funding_Source: {
-			source_1: '7',
+			source_1: '',
 			source_2: ''
 		}
 	},
@@ -76,21 +77,21 @@ module.exports = {
 	},
 	'Georgia Department of Community Affairs': {
 		Property: {
-			name: '3',
-			original_address: '5',
-			city: '6',
-			zip: '7',
-			county: '8',
-			total_units: '16'
+			name: 'Property Name',
+			original_address: 'Address',
+			city: 'City',
+			zip: 'Zip Code',
+			county: 'County',
+			total_units: 'Total Units'
 		},
 		Owner: {
-			name: ''
+			name: 'Owner Main Contact (Warm Body)'
 		},
 		Subsidy: {
-			project_name: '3',
-			development_type: '13',
-			start_date: '0',
-			end_date: '',
+			project_name: 'Property Name',
+			development_type: 'New Construction or Acq./Rehab',
+			start_date: 'First PIS',
+			end_date: 'End of Extended Use Period',
 			ami_30: '',
 			ami_50: '',
 			ami_60: '',
@@ -98,49 +99,49 @@ module.exports = {
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: ''
+			low_income_units: 'No. LIHTC Units'
 		},
 		Resident: {
-			type_1: '14',
+			type_1: 'Tenancy',
 			type_2: ''
 		},
 		Funding_Source: {
-			source_1: '11',
-			source_2: '12'
+			source_1: 'Primary Funding Source',
+			source_2: 'Secondary Funding Source'
 		}
 	},
 	'City of Atlanta': {
 		Property: {
-			name: '2',
-			original_address: '3',
+			name: 'Project Name',
+			original_address: 'Full Address',
 			city: '',
 			zip: '',
 			county: '',
-			total_units: ''
+			total_units: 'Total Units'
 		},
 		Owner: {
 			name: ''
 		},
 		Subsidy: {
-			project_name: '2',
-			development_type: '5',
-			start_date: '0',
-			end_date: '1',
-			ami_30: '9',
-			ami_50: '10',
-			ami_60: '11',
-			ami_80: '12',
+			project_name: 'Project Name',
+			development_type: 'Project Type',
+			start_date: 'Units Available Date (Est. or Actual)',
+			end_date: '',
+			ami_30: 'AMI <30%',
+			ami_50: 'AMI <50%',
+			ami_60: 'AMI <60%',
+			ami_80: 'AMI <80%',
 			ami_100: '',
 			ami_115: '',
-			ami_120: '',
-			low_income_units: '14'
+			ami_120: 'AMI <120%',
+			low_income_units: '# of Aff. Units'
 		},
 		Resident: {
-			type_1: '4',
+			type_1: 'Target Population',
 			type_2: ''
 		},
 		Funding_Source: {
-			source_1: '8',
+			source_1: 'Funding Sources',
 			source_2: ''
 		}
 	},

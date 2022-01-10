@@ -1,0 +1,24 @@
+{
+	"1/10/2022": [
+		{
+			"addressProvided": "356 James P Brawley Dr NW, Atlanta, GA 30314, USA",
+			"type": "No start date: 356 James P. Brawley "
+		},
+		{
+			"addressProvided": "395 James P Brawley Dr NW, Atlanta, GA 30314, USA",
+			"type": "No start date: 395 James P. Brawley"
+		},
+		{
+			"addressProvided": "507 English Ave NW, Atlanta, GA 30318, USA",
+			"type": "No start date: 588 and 592 Paines Avenue"
+		},
+		{
+			"addressProvided": "588 and 592 Paines Avenue",
+			"type": "Partial Address Match"
+		},
+		{
+			"addressProvided": "687 and 693 Dalvigney & 613 Echo Street",
+			"type": "Partial Address Match"
+		}
+	]
+}

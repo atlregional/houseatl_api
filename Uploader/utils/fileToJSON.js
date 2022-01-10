@@ -7,6 +7,11 @@ const xlsxToJSON = async (file, sheet, agency) => {
 	console.log('Converting file to JSON...');
 
 	switch (agency) {
+		case 'Atlanta Housing':
+			return XLSX.utils.sheet_to_json(wb.Sheets[sheet], {
+				defval: '',
+				raw: false
+			});
 		case 'National Housing Preservation Database':
 			return XLSX.utils.sheet_to_json(wb.Sheets[sheet], {
 				defval: '',
@@ -17,6 +22,17 @@ const xlsxToJSON = async (file, sheet, agency) => {
 				defval: '',
 				raw: false,
 				range: 3
+			});
+		case 'Georgia Department of Community Affairs':
+			return XLSX.utils.sheet_to_json(wb.Sheets[sheet], {
+				defval: '',
+				raw: false,
+				range: 2
+			});
+		case 'City of Atlanta':
+			return XLSX.utils.sheet_to_json(wb.Sheets[sheet], {
+				defval: '',
+				raw: false
 			});
 		default:
 			break;
