@@ -1,7 +1,8 @@
 require('dotenv').config();
 const fs = require('fs');
 const mongoose = require('mongoose');
-const { xlsxToJSON, csvToJSON } = require('./utils/fileToJSON');
+const agencyConfig = require('./config/agencyConfig');
+const { handleError } = require('./config/errorConfig');
 const createDataObj = require('./utils/createDataObj');
 const {
 	initializeDbUpload,
@@ -13,14 +14,11 @@ const todaysDate = `${
 	date.getMonth() + 1
 }/${date.getDate()}/${date.getFullYear()}`;
 
-const init = async ({
-	directory: directory,
-	filename: filename,
-	sheet: sheet
-}) => {
+const init = async ({ directory, filename, sheet, user }) => {
 	try {
 		if (!directory || !filename) {
 			console.log('missing directory and/or filename arg(s)');
+			console.log('Exiting...');
 			process.exit(1);
 		}
 		const fileType = filename.split('.').includes('csv')
@@ -28,94 +26,79 @@ const init = async ({
 			: filename.split('.').includes('xlsx') ||
 			  filename.split('.').includes('xls')
 			? 'excel'
-			: null;
+			: '';
+
+		if (!fileType) {
+			console.log('Unknown filetype:', filename);
+			console.log('Exiting...');
+			process.exit(1);
+		}
 
 		const path = `./data/${directory}/${filename}`;
 
 		if (!sheet && fileType === 'excel') {
-			console.log('missing sheet arg');
+			console.log('missing sheet arg:', filename);
+			console.log('Exiting...');
 			process.exit(1);
 		}
 
-		const agencyName =
-			directory === 'NHPD'
-				? 'National Housing Preservation Database'
-				: directory === 'InvestAtlanta'
-				? 'Invest Atlanta'
-				: directory === 'Atlanta Housing'
-				? 'Atlanta Housing'
-				: directory === 'DCA'
-				? 'Georgia Department of Community Affairs'
-				: directory === 'City of Atlanta'
-				? directory
-				: '';
+		const agencyObj = agencyConfig[directory] ? agencyConfig[directory] : null;
 
-		if (!agencyName) throw new Error(`No Agency Case- ${directory}`);
+		if (!agencyObj) {
+			console.log('No config found:', directory);
+			console.log('Exiting...');
+			process.exit(1);
+		}
 
 		const data =
 			fileType === 'csv'
-				? await csvToJSON(path)
+				? await agencyObj.csvToJSON(path)
 				: fileType === 'excel'
-				? await xlsxToJSON(path, sheet, agencyName)
+				? await agencyObj.excelToJSON(path, sheet)
 				: [];
+		// console.log(data);
 
 		if (!data[0]) {
-			console.log('No data detected from file...');
+			console.log('No data detected from file:', filename);
 			process.exit(1);
 		}
 
 		// ! Limiting Results for Testing -----------------------------
-		const cityFilter = (agency, item) => {
-			switch (agency) {
-				case 'Invest Atlanta':
-					return true;
-				case 'National Housing Preservation Database':
-					return item.City.toUpperCase() === 'ATLANTA';
-				case 'Atlanta Housing':
-					return item.CITY.toUpperCase() === 'ATLANTA';
-				case 'Georgia Department of Community Affairs':
-					return item.City.toUpperCase() === 'ATLANTA';
-				case 'City of Atlanta':
-					return true;
-				default:
-					return false;
-			}
-		};
-		const dataArr = data
-			.filter(item => cityFilter(agencyName, item))
-			.slice(0, 5);
+		const dataArr = data.filter(item => agencyObj.cityFilter(item));
+		// .slice(0, 20);
+		// console.log(dataArr);
 		// ! ----------------------------------------------------------
 
 		const { userId, uploadId } = await initializeDbUpload(
-			process.env.user_id,
-			agencyName,
+			user,
+			agencyObj.agencyName,
 			filename,
-			true
+			false
 		);
 
 		console.log(`Extracting data from ${dataArr.length} records...`);
 		const errorObj = {};
 
 		for await (const item of dataArr) {
-			const { Property, Subsidy, Owner, Resident, FundingSource, Error } =
-				await createDataObj(agencyName, item);
+			const { Property, Subsidy, Owner, Resident, Funding_Source, Error } =
+				await createDataObj(agencyObj, item);
 
 			if (!Error && Subsidy.start_date) {
-				// If no start_date front end throws an error due to project_name
-				// console.log({ Property, Subsidy, Owner, Resident, FundingSource });
+				// console.log({ Property, Subsidy, Owner, Resident, Funding_Source });
 				await handleCollectionsInsert(userId, uploadId, {
 					Owner,
 					Property,
 					Subsidy,
-					FundingSource,
+					Funding_Source,
 					Resident
 				});
 				console.log('DB updated...');
 			} else if (!Error && !Subsidy.start_date) {
-				const obj = {
-					addressProvided: Property.address,
-					type: `No start date: ${Subsidy.project_name}`
-				};
+				// If no start_date front end throws an error referencing project_name
+				const obj = handleError(
+					Property.address || Property.original_address,
+					`No start date- ${Subsidy.project_name}`
+				);
 
 				!errorObj[todaysDate]
 					? (errorObj[todaysDate] = [obj])
@@ -128,7 +111,7 @@ const init = async ({
 		}
 
 		if (Object.keys(errorObj)[0]) {
-			const errorFilePath = `./Uploader/Errors/${agencyName}/errors.json`;
+			const errorFilePath = `./Uploader/error_logs/${agencyObj.agencyName}/errors.json`;
 			fs.writeFileSync(errorFilePath, JSON.stringify(errorObj));
 
 			console.log(`Errors Detected. See ${errorFilePath} for more info.`);
@@ -147,7 +130,8 @@ mongoose
 		await init({
 			directory: process.argv[2],
 			filename: process.argv[3],
-			sheet: process.argv[4]
+			sheet: process.argv[4],
+			user: process.env.user_id
 		});
 		console.log('Process complete.');
 		process.exit(0);

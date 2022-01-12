@@ -1,85 +1,18 @@
 const { Client } = require('@googlemaps/google-maps-services-js');
-const mappings = require('../config/mappings');
 const apiKey = process.env.GOOGLE_API_KEY;
 const client = new Client();
+const { handleError } = require('../config/errorConfig');
 
 let partialMatch = false;
 
-const handleDataType = (type, value, agency) => {
-	if (!value || value === ' - ') return '';
-
-	switch (type) {
-		case 'str':
-			return value.toString();
-		case 'int':
-			return +value;
-		case 'date':
-			if (agency === 'Invest Atlanta') {
-				const dateArr = value !== 'Under Construction' ? value.split('-') : [];
-
-				if (dateArr[0]) {
-					const month =
-						new Date(`${dateArr[0]}-01-20${dateArr[1]}`).getMonth() + 1;
-
-					return `${month}/01/20${dateArr[1]}`;
-				} else return value;
-			}
-
-			if (agency === 'Atlanta Housing' || agency === 'City of Atlanta') {
-				const dateArr = value.split('/');
-
-				return `${dateArr[0]}/${dateArr[1]}/20${dateArr[2]}`;
-			}
-			return value;
-		default:
-			return value.toString();
-	}
-};
-
-const calculateTotal = (item, value) => {
-	let total = 0;
-
-	value.forEach(key => {
-		if (item[key]) total += +item[key];
-	});
-
-	return total;
-};
-
-const createCollectionObj = (item, agency, type) => {
-	const mapping = mappings[agency][type];
-
-	const dataTypes = mappings['data_type_mapping'][type];
-
+const mapDataToObjs = async (agencyObj, data) => {
 	const obj = {};
 
-	// Key: key we want for db, Value: Header from file
-	Object.entries(mapping).forEach(([key, value]) => {
-		value && typeof value !== 'object'
-			? (obj[key] = handleDataType(dataTypes[key], item[mapping[key]], agency))
-			: // ! Handles case where data has AMI split up into headers based on # of bedrooms
-			value &&
-			  typeof value === 'object' &&
-			  agency === 'Invest Atlanta' &&
-			  type === 'Subsidy'
-			? (obj[key] = handleDataType(
-					dataTypes[key],
-					calculateTotal(item, value),
-					agency
-			  ))
-			: (obj[key] = '');
+	agencyObj.getCollectionsArr().forEach(collection => {
+		obj[collection] = agencyObj.createCollectionObj(collection, data);
 	});
+
 	return obj;
-};
-
-const mapDataToObjs = async (agency, data) => {
-	const Property = createCollectionObj(data, agency, 'Property');
-	const Subsidy = createCollectionObj(data, agency, 'Subsidy');
-	const Owner = createCollectionObj(data, agency, 'Owner');
-	const Resident = createCollectionObj(data, agency, 'Resident');
-	const FundingSource = createCollectionObj(data, agency, 'Funding_Source');
-
-	return { Property, Subsidy, Owner, Resident, FundingSource };
 };
 
 const clientHandler = async ({
@@ -90,7 +23,9 @@ const clientHandler = async ({
 	latitude,
 	longitude
 }) => {
+	// If partial match is true, data contains lat and lng
 	const param = original_address && !partialMatch ? 'address' : 'latlng';
+
 	const location =
 		original_address && !partialMatch
 			? `${original_address} ${city ? ',' + city : ''}, GA${
@@ -116,15 +51,13 @@ const clientHandler = async ({
 			!partialMatch
 		) {
 			partialMatch = true;
+			// Recursively runs function again with lat & lng to obtain geolocation of property
 			clientHandler({ name, original_address, city, zip, latitude, longitude });
 		} else if (data.results[0].partial_match && original_address) {
-			return {
-				data: {
-					addressProvided: original_address,
-					type: 'Partial Address Match'
-				},
-				error: true
-			};
+			return handleError(
+				original_address,
+				'Geolocation error - Partial address match'
+			);
 		}
 
 		if (partialMatch) partialMatch = false;
@@ -135,13 +68,7 @@ const clientHandler = async ({
 			original_address ? original_address : 'N/A'
 		}, city: ${city ? city : 'N/A'}, zip: ${zip ? zip : 'N/A'}`;
 
-		return {
-			data: {
-				providedAddress: errorAddressStr,
-				type: 'Geolocation error - Not enough Info'
-			},
-			error: true
-		};
+		return handleError(errorAddressStr, 'Geolocation error - Not enough info');
 	}
 };
 
@@ -193,19 +120,13 @@ const geocodeProperty = async ({
 	} else if (data && error) {
 		return { geocodedObj: data, error: error };
 	} else if (!data) {
-		return {
-			geocodedObj: {
-				addressProvided: original_address,
-				type: 'Geolocation Error - Nothing returned from geolocation process'
-			},
-			error: true
-		};
+		return handleError(original_address, 'Geolocation Error - No return');
 	}
 };
 
-const createDataObj = async (agency, item) => {
-	const { Property, Subsidy, Owner, Resident, FundingSource } =
-		await mapDataToObjs(agency, item);
+const createDataObj = async (agencyObj, item) => {
+	const { Property, Subsidy, Owner, Resident, Funding_Source } =
+		await mapDataToObjs(agencyObj, item);
 
 	const { geocodedObj, error } = await geocodeProperty(Property);
 
@@ -221,7 +142,7 @@ const createDataObj = async (agency, item) => {
 			Subsidy,
 			Owner,
 			Resident,
-			FundingSource,
+			Funding_Source,
 			Error: ''
 		};
 	} else {

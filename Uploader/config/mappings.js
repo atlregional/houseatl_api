@@ -91,7 +91,7 @@ module.exports = {
 			project_name: 'Property Name',
 			development_type: 'New Construction or Acq./Rehab',
 			start_date: 'First PIS',
-			end_date: 'End of Extended Use Period',
+			end_date: 'End of Compliance Period w/o LURC yrs added',
 			ami_30: '',
 			ami_50: '',
 			ami_60: '',
@@ -163,6 +163,7 @@ module.exports = {
 			development_type: 'CONSTRUCTION TYPE',
 			start_date: 'DATE CLOSED',
 			end_date: 'EFFECTIVE AFFORDABILITY END DATE',
+			// ! array allows to loop over over # of BR's to calculate total units in this category
 			ami_30: [
 				'STUDIO   30%AMI',
 				'1 BDRM          30% AMI',
@@ -221,7 +222,7 @@ module.exports = {
 		Subsidy: {
 			project_name: 'str',
 			development_type: 'str',
-			start_date: 'date',
+			start_date: 'date', // ! MM/DD/YYYY format -- Front end converts to js Date
 			end_date: 'date',
 			ami_30: 'int',
 			ami_50: 'int',
