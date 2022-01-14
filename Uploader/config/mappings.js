@@ -7,8 +7,7 @@ module.exports = {
 			state: '',
 			zip: 'ZIP',
 			county: '',
-			total_units: '# OF AHA ASSISTED UNITS',
-			active: 'AGREEMENT STATUS'
+			total_units: '# OF AHA ASSISTED UNITS'
 		},
 		Owner: {
 			name: ''
@@ -46,8 +45,7 @@ module.exports = {
 			longitude: 'Longitude',
 			latitude: 'Latitude',
 			county: '',
-			total_units: 'Known Total Units',
-			active: 'Subsidy Status'
+			total_units: 'Known Total Units'
 		},
 		Owner: {
 			name: 'Owner Name'
@@ -197,7 +195,7 @@ module.exports = {
 		},
 		Resident: {
 			type_1: 'TENANT TYPE',
-			type_2: 'CONSTRUCTION TYPE'
+			type_2: ''
 		},
 		Funding_Source: {
 			// No funding source data provided...
@@ -213,8 +211,7 @@ module.exports = {
 			city: 'str',
 			zip: 'str',
 			county: 'str',
-			total_units: 'int',
-			active: 'str'
+			total_units: 'int'
 		},
 		Owner: {
 			name: 'str'

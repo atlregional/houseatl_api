@@ -17,9 +17,10 @@ const PropertySchema = Schema(
 		tax_allocation_district: { type: String },
 		city_council_district: { type: String },
 		total_units: { type: Number },
-		active: { type: String },
 		owner_id: { type: Schema.Types.ObjectId, ref: 'owner' },
+		subsidies: [{ type: Schema.Types.ObjectId, ref: 'subsidy' }],
 		upload_id: { type: Schema.Types.ObjectId, ref: 'upload' },
+		uploads: [{ type: Schema.Types.ObjectId, ref: 'upload' }],
 		user_id: { type: Schema.Types.ObjectId, ref: 'user' },
 		created_on: { type: Date, default: Date.now() },
 		updated_on: { type: Date, default: Date.now() }
@@ -28,5 +29,9 @@ const PropertySchema = Schema(
 );
 
 PropertySchema.virtual('id').get(() => this._id);
+// PropertySchema.virtual('upload_id').get(() => {
+// 	console.log(this.uploads);
+// 	return this.uploads[0];
+// });
 
 module.exports = model('property', PropertySchema);

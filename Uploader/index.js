@@ -9,7 +9,7 @@ const {
 	handleCollectionsInsert
 } = require('./utils/dbInteraction');
 
-const date = new Date(Date.now());
+const date = new Date();
 const todaysDate = `${
 	date.getMonth() + 1
 }/${date.getDate()}/${date.getFullYear()}`;
@@ -63,13 +63,11 @@ const init = async ({ directory, filename, sheet, user }) => {
 			process.exit(1);
 		}
 
-		// ! Limiting Results for Testing -----------------------------
 		const dataArr = data.filter(item => agencyObj.cityFilter(item));
-		// .slice(0, 20);
-		// console.log(dataArr);
-		// ! ----------------------------------------------------------
+		// ! Limiting Results for Testing -----------------------------
+		// .slice(5, 10);
 
-		const { userId, uploadId } = await initializeDbUpload(
+		const { userId, agencyId, uploadId } = await initializeDbUpload(
 			user,
 			agencyObj.agencyName,
 			filename,
@@ -85,7 +83,7 @@ const init = async ({ directory, filename, sheet, user }) => {
 
 			if (!Error && Subsidy.start_date) {
 				// console.log({ Property, Subsidy, Owner, Resident, Funding_Source });
-				await handleCollectionsInsert(userId, uploadId, {
+				await handleCollectionsInsert(userId, agencyId, uploadId, {
 					Owner,
 					Property,
 					Subsidy,

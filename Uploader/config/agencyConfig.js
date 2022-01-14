@@ -11,6 +11,19 @@ const helpers = {
 		});
 
 		return total;
+	},
+	formatDate(value, type) {
+		const formatted = value.toString().split('')[
+			type === 'month' || type === 'day' ? 1 : 2
+		]
+			? true
+			: false;
+
+		if (formatted) return value;
+
+		if (type === 'month' || type === 'day') return `0${value}`;
+
+		if (type === 'year') return `20${value}`;
 	}
 };
 
@@ -40,31 +53,42 @@ const initialMethods = {
 	// Dates come in as MM/DD/YY, falling in the 2000's
 	handleDate(value) {
 		const dateArr = value.split('/');
-		return `${dateArr[0]}/${dateArr[1]}/20${dateArr[2]}`;
+		return `${helpers.formatDate(dateArr[0], 'month')}/${helpers.formatDate(
+			dateArr[1],
+			'day'
+		)}/${helpers.formatDate(dateArr[2], 'year')}`;
 	},
 	handleDataType(type, value) {
-		if (!value || value === ' - ') return '';
+		const val =
+			value && typeof value === 'string' ? value.trim() : value ? value : '';
+
+		if (!val || val === '-' || val === 'Under Construction' || val === 'N/A')
+			return '';
 
 		switch (type) {
 			case 'str':
-				const str = value.toString().trim();
+				const str = val.toString();
 				// Front end hardcoded options for Development Type in map filter are: New Construction, Rehab, Acquisition/Rehab, Rehabilitation -- this should be cleaned up
 				// Cases not met: 'Rehab/Preservation', 'Acquisition', 'Acquisition New Construction',
+
 				if (str === 'Acq./Rehab' || str === 'Acquisition Rehabilitation')
 					return 'Acquisition/Rehab';
-				if (str === 'Rehab') return 'Rehabilitation';
-				if (str === 'Rehab/Preservation, Rental Assistance')
-					return 'Rehab/Preservation';
+				if (str === 'Rehabilitation') return 'Rehab';
+				if (
+					str === 'Rehab/Preservation' ||
+					str === 'Rehab/Preservation, Rental Assistance'
+				)
+					return 'Preservation/Rehab';
 				if (str === 'New Construction, Rental Assistance')
 					return 'New Construction';
 
 				return str;
 			case 'int':
-				return parseInt(value);
+				return parseInt(val);
 			case 'date':
-				return this.handleDate(value);
+				return this.handleDate(val);
 			default:
-				return value.toString().trim();
+				return val;
 		}
 	},
 	createCollectionObj(type, item) {
@@ -100,39 +124,30 @@ module.exports = {
 		...initialMethods,
 		agencyName: 'Georgia Department of Community Affairs',
 		cityKey: 'City',
-		xlsxRange: 2,
-		// Dates come in as MM/DD/YY or MM/DD/YYYY
-		handleDate(value) {
-			const dateArr = value.split('/');
-
-			if (dateArr[2].split('').length === 2)
-				return `${dateArr[0]}/${dateArr[1]}/20${dateArr[2]}`;
-
-			return value.toString();
-		}
+		xlsxRange: 2
 	},
 	NHPD: {
 		...initialMethods,
 		agencyName: 'National Housing Preservation Database',
 		cityKey: 'City',
-		xlsxRange: 0,
-		// Dates come in as MM/DD/YYYY
-		handleDate(value) {
-			return value.toString();
-		}
+		xlsxRange: 0
 	},
 	InvestAtlanta: {
 		...initialMethods,
 		agencyName: 'Invest Atlanta',
 		cityKey: '',
 		xlsxRange: 3,
-		// Dates come in as MM-YY, '', or Under Construction
+		// Dates come in as MM-YY
 		handleDate(value) {
-			if (value === 'Under Construction') return '';
-
 			const dateArr = value.split('-');
+			if (!dateArr[0] || !dateArr[1]) return '';
+
 			const month = new Date(`${dateArr[0]}-01-20${dateArr[1]}`).getMonth() + 1;
-			return `${month}/01/20${dateArr[1]}`;
+
+			return `${helpers.formatDate(month, 'month')}/01/${helpers.formatDate(
+				dateArr[1],
+				'year'
+			)}`;
 		},
 		createCollectionObj(type, item) {
 			const mapping = this.getMapping()[type];
