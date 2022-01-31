@@ -1,1 +1,561 @@
-{"1/13/2022":[{"data":{"addressProvided":"806 Murphy Ave SW, Atlanta, GA 30310, USA","text":"No start date- ADAIR COURT"},"error":true},{"data":{"addressProvided":"358 Fraser St SE, Atlanta, GA 30312, USA","text":"No start date- Capitol II (Phase IV)"},"error":true},{"data":{"addressProvided":"600 Greensferry Ave SW, Atlanta, GA 30314, USA","text":"No start date- CASTLEBERRY HILL PHASE I"},"error":true},{"data":{"addressProvided":"464 Boulevard NE, Atlanta, GA 30308, USA","text":"No start date- CITY LIGHTS II"},"error":true},{"data":{"addressProvided":"1374 Murphy Ave SW, Atlanta, GA 30310, USA","text":"No start date- GATEWAY CAPITOL VIEW"},"error":true},{"data":{"addressProvided":"765 McDaniel St SW, Atlanta, GA 30310, USA","text":"No start date- HERITAGE STATION FAMILY ( PITTSBURGH PHASE I )"},"error":true},{"data":{"addressProvided":"585 McDaniel St SW, Atlanta, GA 30312, USA","text":"No start date- Mechanicsville III"},"error":true},{"data":{"addressProvided":"190 Maple St NW, Atlanta, GA 30314, USA","text":"No start date- OASIS OF VINE CITY"},"error":true},{"data":{"addressProvided":"1504 Bouldercrest Rd, Atlanta, GA 30316, USA","text":"No start date- PARADISE EAST APARTMENTS"},"error":true},{"data":{"addressProvided":"3601 Piedmont Rd NE, Atlanta, GA 30305, USA","text":"No start date- PIEDMONT SENIOR TOWER"},"error":true},{"data":{"addressProvided":"400 Ralph McGill Blvd NE, Atlanta, GA 30312, USA","text":"No start date- THE RESIDENCES AT MAGGIE CAPITOL"},"error":true},{"addressProvided":"GREEN FERY AVE & MNORTHSIDE DR","text":"Geolocation error - Partial address match"},{"data":{"addressProvided":"130 Lawshe St SW, Atlanta, GA 30314, USA","text":"No start date- VERANDA AT SCHOLARS LANDING"},"error":true},{"data":{"addressProvided":"14 Meldon Ave SE, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"385 Holly St NW, Atlanta, GA 30318, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"605 Spencer St NW, Atlanta, GA 30314, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1250 Donnelly Ave SW, Atlanta, GA 30310, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"954 Hightower Rd NW, Atlanta, GA 30318, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"150 Peyton Pl SW, Atlanta, GA 30311, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1093 West Ave SW, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"115 Hilliard St SE, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1150 Astor Ave SW, Atlanta, GA 30310, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"125 Logan St SE, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1281 Caroline St NE, Atlanta, GA 30307, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"130 Lawshe St SW, Atlanta, GA 30314, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1311 Cleveland Ave, Atlanta, GA 30344, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"134 John Hope Dr SW, Atlanta, GA 30314, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1374 Murphy Ave SW, Atlanta, GA 30310, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"150 10th St NE, Atlanta, GA 30309, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"150 Hutchinson St NE, Atlanta, GA 30307, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"16 William Holmes Borders Senior Dr SE, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1671 James Jackson Pkwy NW, Atlanta, GA 30318, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"183 Mt Zion Rd SE, Atlanta, GA 30354, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1830 Campbellton Rd SW, Atlanta, GA 30311, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1900 Perry Blvd NW, Atlanta, GA 30318, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"200 Peyton Pl SW, Atlanta, GA 30311, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2045 Graham Cir SE, Atlanta, GA 30316, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2141 Springdale Rd SW, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"217 Thirkield Ave SE, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"220 Bowen Cir SW, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"234 Memorial Dr SW, Atlanta, GA 30303, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"240 Amal Dr SW, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2423 M.L.K. Jr Dr SW, Atlanta, GA 30311, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2524 M.L.K. Jr Dr SW, Atlanta, GA 30311, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2745 Old Hapeville Rd SW, Atlanta, GA 30354, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2748 Donald Lee Hollowell Pkwy NW, Atlanta, GA 30318, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2798 Peek Rd NW, Atlanta, GA 30318, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2800 M.L.K. Jr Dr SW, Atlanta, GA 30311, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2891 Springdale Rd SW, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2911 Pharr Ct S Northwest, Atlanta, GA 30305, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"2999 Continental Colony Pkwy SW, Atlanta, GA 30331, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"315 Tanner St SE, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"3450 Forrest Park Rd SE, Atlanta, GA 30354, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"3537 M.L.K. Jr Dr SW, Atlanta, GA 30331, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"355 Peachtree St NE, Atlanta, GA 30308, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"3601 Piedmont Rd NE, Atlanta, GA 30305, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"372 Legacy Dr SW, Atlanta, GA 30310, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"3724 M.L.K. Jr Dr SW, Atlanta, GA 30331, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"380 Martin St SE, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"435 Joseph E Lowery Blvd SW, Atlanta, GA 30310, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"4725 Walton Crossing SW, Atlanta, GA 30331, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"Auburn Glenn, 49 Boulevard SE, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"490 Glenn St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"500 Cleveland Ave SE, Atlanta, GA 30354, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"505 Fulton St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"515 Fulton St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"520 Fulton St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"540 Humphries St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"55 Hilliard St SE, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"555 McDaniel St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"565 McDaniel St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"565 Wells St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"585 McDaniel St SW, Atlanta, GA 30312, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"600 Greensferry Ave SW, Atlanta, GA 30314, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"695 Field St SE, Atlanta, GA 30316, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"765 McDaniel St SW, Atlanta, GA 30310, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"960 Constitution Rd SE, Atlanta, GA 30315, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"1298 Murphy Ave SW, Atlanta, GA 30310, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"3522 Blair Cir NE, Atlanta, GA 30319, USA","text":"No start date- "},"error":true},{"data":{"addressProvided":"355 Peachtree Center Ave NE, Atlanta, GA 30303, USA","text":"No start date- "},"error":true}]}
+{
+	"1/13/2022": [
+		{
+			"data": {
+				"addressProvided": "806 Murphy Ave SW, Atlanta, GA 30310, USA",
+				"text": "No start date- ADAIR COURT"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "358 Fraser St SE, Atlanta, GA 30312, USA",
+				"text": "No start date- Capitol II (Phase IV)"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "600 Greensferry Ave SW, Atlanta, GA 30314, USA",
+				"text": "No start date- CASTLEBERRY HILL PHASE I"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "464 Boulevard NE, Atlanta, GA 30308, USA",
+				"text": "No start date- CITY LIGHTS II"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1374 Murphy Ave SW, Atlanta, GA 30310, USA",
+				"text": "No start date- GATEWAY CAPITOL VIEW"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "765 McDaniel St SW, Atlanta, GA 30310, USA",
+				"text": "No start date- HERITAGE STATION FAMILY ( PITTSBURGH PHASE I )"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "585 McDaniel St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- Mechanicsville III"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "190 Maple St NW, Atlanta, GA 30314, USA",
+				"text": "No start date- OASIS OF VINE CITY"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1504 Bouldercrest Rd, Atlanta, GA 30316, USA",
+				"text": "No start date- PARADISE EAST APARTMENTS"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "3601 Piedmont Rd NE, Atlanta, GA 30305, USA",
+				"text": "No start date- PIEDMONT SENIOR TOWER"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "400 Ralph McGill Blvd NE, Atlanta, GA 30312, USA",
+				"text": "No start date- THE RESIDENCES AT MAGGIE CAPITOL"
+			},
+			"error": true
+		},
+		{
+			"addressProvided": "GREEN FERY AVE & MNORTHSIDE DR",
+			"text": "Geolocation error - Partial address match"
+		},
+		{
+			"data": {
+				"addressProvided": "130 Lawshe St SW, Atlanta, GA 30314, USA",
+				"text": "No start date- VERANDA AT SCHOLARS LANDING"
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "14 Meldon Ave SE, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "385 Holly St NW, Atlanta, GA 30318, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "605 Spencer St NW, Atlanta, GA 30314, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1250 Donnelly Ave SW, Atlanta, GA 30310, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "954 Hightower Rd NW, Atlanta, GA 30318, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "150 Peyton Pl SW, Atlanta, GA 30311, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1093 West Ave SW, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "115 Hilliard St SE, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1150 Astor Ave SW, Atlanta, GA 30310, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "125 Logan St SE, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1281 Caroline St NE, Atlanta, GA 30307, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "130 Lawshe St SW, Atlanta, GA 30314, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1311 Cleveland Ave, Atlanta, GA 30344, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "134 John Hope Dr SW, Atlanta, GA 30314, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1374 Murphy Ave SW, Atlanta, GA 30310, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "150 10th St NE, Atlanta, GA 30309, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "150 Hutchinson St NE, Atlanta, GA 30307, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "16 William Holmes Borders Senior Dr SE, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1671 James Jackson Pkwy NW, Atlanta, GA 30318, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "183 Mt Zion Rd SE, Atlanta, GA 30354, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1830 Campbellton Rd SW, Atlanta, GA 30311, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1900 Perry Blvd NW, Atlanta, GA 30318, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "200 Peyton Pl SW, Atlanta, GA 30311, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2045 Graham Cir SE, Atlanta, GA 30316, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2141 Springdale Rd SW, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "217 Thirkield Ave SE, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "220 Bowen Cir SW, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "234 Memorial Dr SW, Atlanta, GA 30303, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "240 Amal Dr SW, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2423 M.L.K. Jr Dr SW, Atlanta, GA 30311, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2524 M.L.K. Jr Dr SW, Atlanta, GA 30311, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2745 Old Hapeville Rd SW, Atlanta, GA 30354, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2748 Donald Lee Hollowell Pkwy NW, Atlanta, GA 30318, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2798 Peek Rd NW, Atlanta, GA 30318, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2800 M.L.K. Jr Dr SW, Atlanta, GA 30311, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2891 Springdale Rd SW, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2911 Pharr Ct S Northwest, Atlanta, GA 30305, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "2999 Continental Colony Pkwy SW, Atlanta, GA 30331, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "315 Tanner St SE, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "3450 Forrest Park Rd SE, Atlanta, GA 30354, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "3537 M.L.K. Jr Dr SW, Atlanta, GA 30331, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "355 Peachtree St NE, Atlanta, GA 30308, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "3601 Piedmont Rd NE, Atlanta, GA 30305, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "372 Legacy Dr SW, Atlanta, GA 30310, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "3724 M.L.K. Jr Dr SW, Atlanta, GA 30331, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "380 Martin St SE, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "435 Joseph E Lowery Blvd SW, Atlanta, GA 30310, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "4725 Walton Crossing SW, Atlanta, GA 30331, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "Auburn Glenn, 49 Boulevard SE, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "490 Glenn St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "500 Cleveland Ave SE, Atlanta, GA 30354, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "505 Fulton St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "515 Fulton St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "520 Fulton St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "540 Humphries St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "55 Hilliard St SE, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "555 McDaniel St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "565 McDaniel St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "565 Wells St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "585 McDaniel St SW, Atlanta, GA 30312, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "600 Greensferry Ave SW, Atlanta, GA 30314, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "695 Field St SE, Atlanta, GA 30316, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "765 McDaniel St SW, Atlanta, GA 30310, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "960 Constitution Rd SE, Atlanta, GA 30315, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "1298 Murphy Ave SW, Atlanta, GA 30310, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "3522 Blair Cir NE, Atlanta, GA 30319, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		},
+		{
+			"data": {
+				"addressProvided": "355 Peachtree Center Ave NE, Atlanta, GA 30303, USA",
+				"text": "No start date- "
+			},
+			"error": true
+		}
+	]
+}

@@ -7,7 +7,7 @@ module.exports = {
 			state: '',
 			zip: 'ZIP',
 			county: '',
-			total_units: '# OF AHA ASSISTED UNITS'
+			total_units: ''
 		},
 		Owner: {
 			name: ''

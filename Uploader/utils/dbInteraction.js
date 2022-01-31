@@ -73,6 +73,18 @@ module.exports = {
 			  })
 			: existingProperty;
 
+		const existingSubs = dbProperty.subsidies || [];
+
+		// const test = {};
+		if (existingSubs[0])
+			existingSubs.forEach(sub => {
+				console.log(sub);
+				// compare sub to Subsidy and determine match
+				// if complete match, do not create sub
+				// if update, "consolidate sub with new Subsidy"
+				// if not a match, create new sub
+			});
+
 		const dbSubsidy = await db.Subsidy.create({
 			...Subsidy,
 			property_id: dbProperty._id,

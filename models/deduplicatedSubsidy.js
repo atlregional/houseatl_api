@@ -20,6 +20,7 @@ const DeduplicatedSubsidySchema = Schema(
 		low_income_units: { type: Number },
 		property_id: { type: Schema.Types.ObjectId, ref: 'property' },
 		user_id: { type: Schema.Types.ObjectId, ref: 'user' },
+		subsidy_id: { type: Schema.Types.ObjectId, ref: 'subsidy' },
 		funding_sources: [{ type: Schema.Types.ObjectId, ref: 'fundingSource' }],
 		created_on: { type: Date, default: Date.now() },
 		updated_on: { type: Date, default: Date.now() }

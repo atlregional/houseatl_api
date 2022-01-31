@@ -119,8 +119,11 @@ const init = async ({ directory, filename, sheet, user }) => {
 	}
 };
 
+// const uri = process.env.MONGODB_URI || 'mongodb://localhost/houseatl';
+const uri = 'mongodb://localhost/houseatl';
+
 mongoose
-	.connect(process.env.MONGODB_URI || 'mongodb://localhost/houseatl', {
+	.connect(uri, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true
 	})

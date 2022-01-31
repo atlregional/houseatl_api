@@ -6,5 +6,6 @@ module.exports = {
 	Agency: require('./agency'),
 	Upload: require('./upload'),
 	Owner: require('./owner'),
-	FundingSource: require('./fundingSource')
+	FundingSource: require('./fundingSource'),
+	DeduplicatedSubsidy: require('./deduplicatedSubsidy')
 };
