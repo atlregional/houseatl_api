@@ -2,8 +2,9 @@ require('dotenv').config();
 const fs = require('fs');
 const mongoose = require('mongoose');
 const agencyConfig = require('./config/agencyConfig');
-const { handleError } = require('./config/errorConfig');
 const createDataObj = require('./utils/createDataObj');
+// const { deduplicateSubsidies } = require('./utils/deduplicateSubsidies');
+const { handleError } = require('./config/errorConfig');
 const {
 	initializeDbUpload,
 	handleCollectionsInsert
@@ -56,22 +57,21 @@ const init = async ({ directory, filename, sheet, user }) => {
 				: fileType === 'excel'
 				? await agencyObj.excelToJSON(path, sheet)
 				: [];
-		// console.log(data);
 
 		if (!data[0]) {
 			console.log('No data detected from file:', filename);
 			process.exit(1);
 		}
 
-		const dataArr = data.filter(item => agencyObj.cityFilter(item));
+		const dataArr = data.filter(item => agencyObj.preFilter(item));
 		// ! Limiting Results for Testing -----------------------------
 		// .slice(5, 10);
-
+		// console.log(dataArr);
 		const { userId, agencyId, uploadId } = await initializeDbUpload(
 			user,
 			agencyObj.agencyName,
 			filename,
-			false
+			true
 		);
 
 		console.log(`Extracting data from ${dataArr.length} records...`);
@@ -90,7 +90,6 @@ const init = async ({ directory, filename, sheet, user }) => {
 					Funding_Source,
 					Resident
 				});
-				console.log('DB updated...');
 			} else if (!Error && !Subsidy.start_date) {
 				// If no start_date front end throws an error referencing project_name
 				const obj = handleError(

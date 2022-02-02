@@ -4,6 +4,7 @@ const OwnerSchema = Schema(
 	{
 		name: { type: String },
 		user_id: { type: Schema.Types.ObjectId, ref: 'user' },
+		property_id: { type: Schema.Types.ObjectId, ref: 'property' },
 		uploads: [{ type: Schema.Types.ObjectId, ref: 'upload' }],
 		created_on: { type: Date, default: Date.now() },
 		updated_on: { type: Date, default: Date.now() }

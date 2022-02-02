@@ -28,7 +28,7 @@ const helpers = {
 };
 
 const initialMethods = {
-	cityFilter(obj) {
+	preFilter(obj) {
 		if (this.cityKey) return obj[this.cityKey].toUpperCase() === 'ATLANTA';
 		return true; // no cityKey all docs returned: City of Atlanta, Invest Atlanta
 	},
@@ -39,7 +39,8 @@ const initialMethods = {
 		return XLSX.utils.sheet_to_json(XLSX.readFile(file).Sheets[sheet], options);
 	},
 	async csvToJSON(file) {
-		return csv().fromFile(file);
+		// Don't interpret dots (.) and square brackets in header fields as nested object or array identifiers at all (treat them like regular characters for JSON field identifiers)
+		return csv({ flatKeys: true }).fromFile(file);
 	},
 	getMapping() {
 		return mappings[this.agencyName];
@@ -102,6 +103,10 @@ const initialMethods = {
 				? (obj[key] = this.handleDataType(dataTypes[key], item[value]))
 				: (obj[key] = '');
 		});
+
+		if (this.agencyName === 'Atlanta Housing' && type === 'Funding_Source')
+			obj['source_1'] = 'HomeFlex';
+
 		return obj;
 	}
 };
@@ -130,7 +135,22 @@ module.exports = {
 		...initialMethods,
 		agencyName: 'National Housing Preservation Database',
 		cityKey: 'City',
-		xlsxRange: 0
+		xlsxRange: 0,
+		preFilter(obj) {
+			const acceptedTypes = [
+				'HOME',
+				'Section 8',
+				'Section 202',
+				'Public Housing'
+			];
+			if (obj['Subsidy Name']) {
+				return (
+					obj[this.cityKey].toUpperCase() === 'ATLANTA' &&
+					acceptedTypes.includes(obj['Subsidy Name'])
+				);
+			}
+			return obj[this.cityKey].toUpperCase() === 'ATLANTA';
+		}
 	},
 	InvestAtlanta: {
 		...initialMethods,
