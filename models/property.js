@@ -11,7 +11,7 @@ const PropertySchema = Schema(
 		county: { type: String },
 		latitude: { type: Number },
 		longitude: { type: Number },
-		location: { type: Object },
+		geometry: { type: Object },
 		census_tract: { type: String },
 		neighborhood_statistical_area: { type: String },
 		neighborhood_planning_unit: { type: String },

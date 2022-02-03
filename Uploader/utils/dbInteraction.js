@@ -64,6 +64,7 @@ const handleNewRecord = async ({
 const handleDuplicatesAndUpdate = async props => {
 	const {
 		property,
+		newProperty,
 		existingSubsArr,
 		newResidentArr,
 		newOwnerObj,
@@ -77,6 +78,7 @@ const handleDuplicatesAndUpdate = async props => {
 		props.existingSubId = subsidyId;
 
 		const isDuplicate = await deduplicateSubsidies(props);
+
 		if (isDuplicate) {
 			updated = true;
 			const existingResidents = await db.Resident.find({
@@ -101,18 +103,31 @@ const handleDuplicatesAndUpdate = async props => {
 		}
 	}
 	if (updated) {
+		const propertyUpdateObj = {};
 		const existingOwner = await db.Owner.findById(property.owner_id);
-		if (existingOwner && !existingOwner.name && newOwnerObj.name)
+
+		if (existingOwner && !existingOwner.name && newOwnerObj.name) {
 			await db.Owner.findByIdAndUpdate(existingOwner._id, {
 				...newOwnerObj,
 				updated_on: new Date()
 			});
+			propertyUpdateObj.updated_on = new Date();
+		}
 
-		if (!property.uploads.includes(uploadId))
-			await db.Property.findByIdAndUpdate(property._id, {
-				updated_on: new Date(),
-				$push: { uploads: uploadId }
-			});
+		if (!property.total_units && newProperty.total_units) {
+			propertyUpdateObj.total_units = newProperty.total_units;
+
+			if (!propertyUpdateObj.updated_on)
+				propertyUpdateObj.updated_on = new Date();
+		}
+
+		if (Object.keys(propertyUpdateObj)[0]) {
+			if (!property.uploads.includes(uploadId))
+				propertyUpdateObj.$push = { uploads: uploadId };
+
+			await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
+			console.log('Property Updated.');
+		}
 	}
 	return updated;
 };
@@ -199,6 +214,7 @@ module.exports = {
 
 		const propObj = {
 			property: dbProperty,
+			newProperty: Property,
 			propertyId: dbProperty._id,
 			existingSubsArr: existingSubs,
 			newSubsidy: Subsidy,

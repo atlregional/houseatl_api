@@ -1,1 +1,8 @@
-{"2/1/2022":[{"data":{"addressProvided":"309 Mount Zion Rd SW, Atlanta, GA 30354, USA","text":"No start date- Legacy Village"},"error":true},{"data":{"addressProvided":"309 Mount Zion Rd SW, Atlanta, GA 30354, USA","text":"No start date- Legacy Village"},"error":true}]}
+{
+	"2/3/2022": [
+		{
+			"addressProvided": "546 Morgan St NE, Atlanta, GA 30308, USA",
+			"text": "No start date- "
+		}
+	]
+}

@@ -92,14 +92,14 @@ const init = async ({ directory, filename, sheet, user }) => {
 				});
 			} else if (!Error && !Subsidy.start_date) {
 				// If no start_date front end throws an error referencing project_name
-				const obj = handleError(
+				const { data } = handleError(
 					Property.address || Property.original_address,
 					`No start date- ${Subsidy.project_name}`
 				);
 
 				!errorObj[todaysDate]
-					? (errorObj[todaysDate] = [obj])
-					: errorObj[todaysDate].push(obj);
+					? (errorObj[todaysDate] = [data])
+					: errorObj[todaysDate].push(data);
 			} else if (Error) {
 				!errorObj[todaysDate]
 					? (errorObj[todaysDate] = [Error])

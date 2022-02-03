@@ -1,9 +1,19 @@
 const { Client } = require('@googlemaps/google-maps-services-js');
 const apiKey = process.env.GOOGLE_API_KEY;
 const client = new Client();
+const turf = require('@turf/turf');
+const coaGeoJSON = require('../../geojsons/Cities_Georgia.json');
 const { handleError } = require('../config/errorConfig');
 
 let partialMatch = false;
+
+const turfHandler = propertyCoordinates => {
+	const COACoordinates = coaGeoJSON['features'][0]['geometry']['coordinates'];
+	const point = turf.point(propertyCoordinates);
+	const multiPoly = turf.multiPolygon(COACoordinates);
+
+	return turf.booleanPointInPolygon(point, multiPoly);
+};
 
 const mapDataToObjs = async (agencyObj, data) => {
 	const obj = {};
@@ -51,9 +61,12 @@ const clientHandler = async ({
 			!partialMatch
 		) {
 			partialMatch = true;
-			// Recursively runs function again with lat & lng to obtain geolocation of property
+
+			// Recursively runs function again with lat & lng (if present) to obtain geolocation of property
 			clientHandler({ name, original_address, city, zip, latitude, longitude });
-		} else if (data.results[0].partial_match && original_address) {
+		}
+
+		if (data.results[0].partial_match && original_address) {
 			return handleError(
 				original_address,
 				'Geolocation error - Partial address match'
@@ -80,8 +93,6 @@ const geocodeProperty = async ({
 	latitude,
 	longitude
 }) => {
-	const obj = {};
-
 	const { data, error } = await clientHandler({
 		name,
 		original_address,
@@ -91,7 +102,9 @@ const geocodeProperty = async ({
 		longitude
 	});
 
-	if (data && !error) {
+	const obj = {};
+
+	if (!error) {
 		data['address_components'].forEach(component => {
 			let key = '';
 			switch (component['types'][0]) {
@@ -115,7 +128,8 @@ const geocodeProperty = async ({
 		obj['address'] = data['formatted_address'];
 		obj['latitude'] = data['geometry']['location']['lat'];
 		obj['longitude'] = data['geometry']['location']['lng'];
-		obj['location'] = {
+
+		obj['geometry'] = {
 			type: 'Point',
 			coordinates: [
 				data['geometry']['location']['lng'],
@@ -123,11 +137,20 @@ const geocodeProperty = async ({
 			]
 		};
 
+		const isInCOA = turfHandler(obj['geometry']['coordinates']);
+
+		if (!isInCOA) {
+			const { data, error } = handleError(obj['address'], 'Not in COA');
+
+			return {
+				geocodedObj: data,
+				error
+			};
+		}
+
 		return { geocodedObj: obj, error: error };
-	} else if (data && error) {
-		return { geocodedObj: data, error: error };
-	} else if (!data) {
-		return handleError(original_address, 'Geolocation Error - No return');
+	} else {
+		return { geocodedObj: data, error };
 	}
 };
 
@@ -154,11 +177,6 @@ const createDataObj = async (agencyObj, item) => {
 		};
 	} else {
 		return {
-			Property: '',
-			Subsidy: '',
-			Owner: '',
-			Resident: '',
-			FundingSource: '',
 			Error: geocodedObj
 		};
 	}
