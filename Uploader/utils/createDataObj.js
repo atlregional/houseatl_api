@@ -115,6 +115,13 @@ const geocodeProperty = async ({
 		obj['address'] = data['formatted_address'];
 		obj['latitude'] = data['geometry']['location']['lat'];
 		obj['longitude'] = data['geometry']['location']['lng'];
+		obj['location'] = {
+			type: 'Point',
+			coordinates: [
+				data['geometry']['location']['lng'],
+				data['geometry']['location']['lat']
+			]
+		};
 
 		return { geocodedObj: obj, error: error };
 	} else if (data && error) {

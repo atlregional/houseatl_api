@@ -1,35 +1,11 @@
-const db = require('../../models');
-
-const {
-	getTime,
-	createFundingArrays,
-	evaluateSubsidies,
-	consolidateSubsidies
-} = require('./deduplicateUtils');
-
-const updateDuplicatedSubsidy = async ({
-	subsidyId,
-	updatedSubsidy,
-	dedupSubsidy
-}) => {
-	try {
-		dedupSubsidy.subsidy_id = subsidyId;
-
-		const { _id: newDedupId } = await db.DeduplicatedSubsidy.create(
-			dedupSubsidy
-		);
-
-		updatedSubsidy.deduplicated_subsidies.push(newDedupId);
-
-		await db.Subsidy.updateOne({ _id: subsidyId }, updatedSubsidy);
-	} catch (err) {
-		console.log(err);
-	}
-};
+const { getSubsidy, updateDuplicatedSubsidy } = require('./dbInteraction');
+const { getTime, createFundingArrays, isExactMatch } = require('./utils');
+const consolidateSubsidies = require('./consolidateSubsidies');
 
 const updateSubsidy = async props => {
 	try {
-		const { existingSubsidy, newSubsidy, newFundingSrc, agencyId } = props;
+		const { existingSubsidy, newSubsidy, newFundingSrc, agencyId, uploadId } =
+			props;
 
 		const { existingFundingArr, newFundingArr } = createFundingArrays(
 			existingSubsidy.funding_sources,
@@ -88,7 +64,9 @@ const updateSubsidy = async props => {
 			await updateDuplicatedSubsidy({
 				subsidyId: existingSubsidy._id,
 				updatedSubsidy: consolidatedSubsidy,
-				dedupSubsidy: newSubsidy
+				dedupSubsidy: newSubsidy,
+				uploadId,
+				newFundingSrc
 			});
 		}
 
@@ -98,14 +76,53 @@ const updateSubsidy = async props => {
 	}
 };
 
+const evaluateSubsidies = ({
+	existingSubsidy,
+	newSubsidy,
+	newFundingSrc,
+	agencyId
+}) => {
+	const { existingFundingArr, newFundingArr } = createFundingArrays(
+		existingSubsidy.funding_sources,
+		newFundingSrc
+	);
+
+	const existingAgencyId = existingSubsidy.uploads[0].agency_id;
+
+	if (existingFundingArr.includes('HOME') && newFundingArr.includes('HOME')) {
+		console.log('Sent to update: Both HOME');
+		return { action: 'update' };
+	} else if (
+		JSON.stringify(existingFundingArr) !== JSON.stringify(newFundingArr)
+	) {
+		console.log('Not a duplicate: Funding does not match - Create new record');
+		return { action: 'create' };
+	} else if (isExactMatch(existingSubsidy, newSubsidy)) {
+		console.log('Exact Match: Reject record');
+		return { action: 'reject' };
+	} else if (existingAgencyId.toString() !== agencyId.toString()) {
+		console.log('Sent to update: No agency match');
+		return { action: 'update' };
+	} else if (
+		getTime(existingSubsidy.start_date) === getTime(newSubsidy.start_date) ||
+		getTime(existingSubsidy.end_date) === getTime(newSubsidy.end_date) ||
+		getTime(newSubsidy.start_date) > getTime(existingSubsidy.start_date) ||
+		getTime(newSubsidy.end_date) > getTime(existingSubsidy.end_date)
+	) {
+		console.log('Sent to update: Dates');
+		return { action: 'update' };
+	} else {
+		console.log('No case met in evaluator: Reject record');
+		return { action: 'reject' };
+	}
+};
+
 const deduplicateSubsidies = async props => {
 	const { existingSubId, newSubsidy, newFundingSrc, agencyId } = props;
 
 	try {
 		if (existingSubId) {
-			const existingSubsidy = await db.Subsidy.findById(existingSubId)
-				.populate('funding_sources')
-				.populate('uploads');
+			const existingSubsidy = await getSubsidy(existingSubId);
 
 			const { action } = existingSubsidy
 				? evaluateSubsidies({
@@ -130,4 +147,4 @@ const deduplicateSubsidies = async props => {
 	}
 };
 
-module.exports = { deduplicateSubsidies };
+module.exports = deduplicateSubsidies;

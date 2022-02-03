@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { deduplicateSubsidies } = require('./deduplicateSubsidies');
+const deduplicateSubsidies = require('./Deduplicator/deduplicateSubsidies');
 
 const handleNewRecord = async ({
 	newSubsidy,
@@ -102,14 +102,17 @@ const handleDuplicatesAndUpdate = async props => {
 	}
 	if (updated) {
 		const existingOwner = await db.Owner.findById(property.owner_id);
-
-		if (existingOwner && !existingOwner.name && newOwnerObj.name) {
-			newOwnerObj.updated_on = new Date();
-			await db.Owner.findByIdAndUpdate(existingOwner._id, newOwnerObj);
-			await db.Property.findByIdAndUpdate(property._id, {
+		if (existingOwner && !existingOwner.name && newOwnerObj.name)
+			await db.Owner.findByIdAndUpdate(existingOwner._id, {
+				...newOwnerObj,
 				updated_on: new Date()
 			});
-		}
+
+		if (!property.uploads.includes(uploadId))
+			await db.Property.findByIdAndUpdate(property._id, {
+				updated_on: new Date(),
+				$push: { uploads: uploadId }
+			});
 	}
 	return updated;
 };
@@ -186,7 +189,7 @@ module.exports = {
 						agency_id: agencyId,
 						subsidies: [],
 						upload_id: uploadId,
-						uploads: []
+						uploads: [uploadId]
 				  })
 				: existingProperty;
 
