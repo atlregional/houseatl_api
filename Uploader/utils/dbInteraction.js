@@ -1,5 +1,9 @@
 const db = require('../../models');
+const deduplicatorConfig = require('./Deduplicator/config');
 const deduplicateSubsidies = require('./Deduplicator/deduplicateSubsidies');
+const {
+	getAgenciesForHierarchyCompare
+} = require('./Deduplicator/dbInteraction');
 
 const handleNewRecord = async ({
 	newSubsidy,
@@ -61,75 +65,151 @@ const handleNewRecord = async ({
 	}
 };
 
-const handleDuplicatesAndUpdate = async props => {
+const handleUpdateType = async ({
+	updateObj,
+	existingOwner,
+	newOwnerObj,
+	ownerUpdateObj,
+	property,
+	newProperty,
+	propertyUpdateObj,
+	existingResident,
+	residentUpdateObj,
+	uploadId
+}) => {
+	switch (updateObj.type) {
+		case 'update_all':
+			if (existingOwner.name !== newOwnerObj.name)
+				await db.Owner.findByIdAndUpdate(existingOwner._id, ownerUpdateObj);
+
+			if (property.total_units !== newProperty.total_units)
+				await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
+
+			if (existingResident && residentUpdateObj)
+				db.Resident.findByIdAndUpdate(existingResident._id, residentUpdateObj);
+			break;
+
+		case 'update_null':
+			if (!existingOwner.name && newOwnerObj.name)
+				await db.Owner.findByIdAndUpdate(existingOwner._id, ownerUpdateObj);
+
+			if (!property.total_units && newProperty.total_units)
+				await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
+			break;
+
+		case 'update_hierarchy':
+			const { existingAgency, newAgency } =
+				await getAgenciesForHierarchyCompare(
+					updateObj.existingAgencyId,
+					uploadId
+				);
+			const newAgencyHasPriority =
+				deduplicatorConfig.agencyHierarchy.indexOf(newAgency) <
+				deduplicatorConfig.agencyHierarchy.indexOf(existingAgency);
+
+			if (
+				(!existingOwner.name && newOwnerObj.name) ||
+				(newOwnerObj.name && newAgencyHasPriority)
+			)
+				await db.Owner.findByIdAndUpdate(existingOwner._id, ownerUpdateObj);
+
+			if (
+				(!property.total_units && newProperty.total_units) ||
+				(newProperty.total_units && newAgencyHasPriority)
+			)
+				await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
+
+			if (existingResident && residentUpdateObj && newAgencyHasPriority)
+				await db.Resident.findByIdAndUpdate(
+					existingResident._id,
+					residentUpdateObj
+				);
+			break;
+
+		default:
+			break;
+	}
+};
+
+const updateRelatedCollections = async props => {
 	const {
 		property,
 		newProperty,
-		existingSubsArr,
-		newResidentArr,
+		updateObj,
+		existingOwner,
 		newOwnerObj,
-		userId,
-		uploadId
+		newResidentArr,
+		uploadId,
+		userId
 	} = props;
 
-	let updated = false;
+	const existingResident = await db.Resident.findOne({
+		subsidy_id: updateObj.existingSubId
+	});
+
+	const ownerUpdateObj = { ...newOwnerObj };
+	const propertyUpdateObj = {
+		total_units: newProperty.total_units
+	};
+	const residentUpdateObj = newResidentArr
+		.filter(value => value)
+		.map(item => ({
+			type: item,
+			subsidy_id: updateObj.existingSubId
+		}))[0];
+
+	if (!existingResident && residentUpdateObj)
+		db.Resident.create({
+			...residentUpdateObj,
+			uploads: [uploadId],
+			user_id: userId
+		});
+
+	[ownerUpdateObj, propertyUpdateObj, residentUpdateObj].forEach(obj => {
+		if (obj) {
+			obj.updated_on = new Date();
+			obj.user_id = userId;
+
+			if (!property.uploads.includes(uploadId))
+				obj.$push = { uploads: uploadId };
+		}
+	});
+
+	await handleUpdateType({
+		...props,
+		existingOwner,
+		ownerUpdateObj,
+		propertyUpdateObj,
+		existingResident,
+		residentUpdateObj
+	});
+};
+
+const handleDuplicatesAndUpdate = async props => {
+	const { existingSubsArr } = props;
+
+	const updateObj = { updated: false };
 
 	for await (const subsidyId of existingSubsArr) {
 		props.existingSubId = subsidyId;
 
-		const isDuplicate = await deduplicateSubsidies(props);
+		const { update, type, existingAgencyId } = await deduplicateSubsidies(
+			props
+		);
 
-		if (isDuplicate) {
-			updated = true;
-			const existingResidents = await db.Resident.find({
-				subsidy_id: subsidyId
-			});
-
-			if (existingResidents[0]) {
-				for await (const newResident of newResidentArr) {
-					const filteredResidents = existingResidents.filter(
-						item => item.type === newResident
-					);
-
-					if (!filteredResidents[0])
-						await db.Resident.create({
-							type: newResident,
-							subsidy_id: subsidyId,
-							user_id: userId,
-							uploads: [uploadId]
-						});
-				}
-			}
-		}
+		console.log('Subsidy deduplicated and updated.');
+		updateObj.updated = update;
+		updateObj.type = type;
+		updateObj.existingAgencyId = existingAgencyId;
+		updateObj.existingSubId = subsidyId;
 	}
-	if (updated) {
-		const propertyUpdateObj = {};
-		const existingOwner = await db.Owner.findById(property.owner_id);
 
-		if (existingOwner && !existingOwner.name && newOwnerObj.name) {
-			await db.Owner.findByIdAndUpdate(existingOwner._id, {
-				...newOwnerObj,
-				updated_on: new Date()
-			});
-			propertyUpdateObj.updated_on = new Date();
-		}
-
-		if (!property.total_units && newProperty.total_units) {
-			propertyUpdateObj.total_units = newProperty.total_units;
-
-			if (!propertyUpdateObj.updated_on)
-				propertyUpdateObj.updated_on = new Date();
-		}
-
-		if (Object.keys(propertyUpdateObj)[0]) {
-			if (!property.uploads.includes(uploadId))
-				propertyUpdateObj.$push = { uploads: uploadId };
-
-			await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
-			console.log('Property Updated.');
-		}
+	if (updateObj.updated) {
+		await updateRelatedCollections({ ...props, updateObj });
+		console.log('Collections related to subsidy updated.');
 	}
-	return updated;
+
+	return updateObj.updated;
 };
 
 module.exports = {
@@ -193,20 +273,19 @@ module.exports = {
 					agency_id: agencyId,
 					uploads: [uploadId]
 			  })
-			: null;
+			: await db.Owner.findById(existingProperty.owner_id);
 
-		const dbProperty =
-			!existingProperty && dbOwner
-				? await db.Property.create({
-						...Property,
-						user_id: userId,
-						owner_id: dbOwner._id,
-						agency_id: agencyId,
-						subsidies: [],
-						upload_id: uploadId,
-						uploads: [uploadId]
-				  })
-				: existingProperty;
+		const dbProperty = !existingProperty
+			? await db.Property.create({
+					...Property,
+					user_id: userId,
+					owner_id: dbOwner._id,
+					agency_id: agencyId,
+					subsidies: [],
+					upload_id: uploadId,
+					uploads: [uploadId]
+			  })
+			: existingProperty;
 
 		const existingSubs = dbProperty.subsidies || [];
 
@@ -220,21 +299,20 @@ module.exports = {
 			newSubsidy: Subsidy,
 			newFundingSrc: Funding_Source,
 			newResidentArr: Object.values(Resident),
-			existingOwnerId: dbProperty.owner_id,
+			existingOwner: dbOwner,
 			newOwnerObj: Owner,
 			uploadId,
 			agencyId,
 			userId
 		};
+
 		let createNewRecord = true;
 
 		if (existingSubs[0]) {
 			const isUpdated = await handleDuplicatesAndUpdate(propObj);
 
-			if (isUpdated) {
-				console.log('DB Updated.');
-				createNewRecord = false;
-			} else console.log('Not a duplicate. Creating new record.');
+			if (isUpdated) createNewRecord = false;
+			else console.log('Not a duplicate. Creating new record.');
 		} else console.log('First subsidy for property. Creating new record');
 
 		if (createNewRecord) {

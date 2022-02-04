@@ -63,15 +63,16 @@ const init = async ({ directory, filename, sheet, user }) => {
 			process.exit(1);
 		}
 
-		const dataArr = data.filter(item => agencyObj.preFilter(item));
-		// ! Limiting Results for Testing -----------------------------
-		// .slice(5, 10);
+		const dataArr = data
+			.filter(item => agencyObj.preFilter(item))
+			// ! Limiting Results for Testing -----------------------------
+			.slice(0, 20);
 		// console.log(dataArr);
 		const { userId, agencyId, uploadId } = await initializeDbUpload(
 			user,
 			agencyObj.agencyName,
 			filename,
-			true
+			false
 		);
 
 		console.log(`Extracting data from ${dataArr.length} records...`);

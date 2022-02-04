@@ -4,16 +4,22 @@ const consolidateSubsidies = require('./consolidateSubsidies');
 
 const updateSubsidy = async props => {
 	try {
-		const { existingSubsidy, newSubsidy, newFundingSrc, agencyId, uploadId } =
-			props;
+		const {
+			existingSubsidy,
+			newSubsidy,
+			newFundingSrc,
+			agencyId,
+			uploadId,
+			existingAgencyId,
+			userId
+		} = props;
 
 		const { existingFundingArr, newFundingArr } = createFundingArrays(
 			existingSubsidy.funding_sources,
 			newFundingSrc
 		);
-		const existingAgencyId = existingSubsidy.uploads[0].agency_id;
 
-		const configObj = { update: true, type: 'update_all' };
+		const configObj = { update: true, type: 'update_all', existingAgencyId };
 
 		if (
 			existingFundingArr.includes('HOME') &&
@@ -66,11 +72,12 @@ const updateSubsidy = async props => {
 				updatedSubsidy: consolidatedSubsidy,
 				dedupSubsidy: newSubsidy,
 				uploadId,
-				newFundingSrc
+				newFundingSrc,
+				userId
 			});
 		}
 
-		return configObj.update;
+		return configObj;
 	} catch (err) {
 		console.log(err);
 	}
@@ -80,14 +87,13 @@ const evaluateSubsidies = ({
 	existingSubsidy,
 	newSubsidy,
 	newFundingSrc,
-	agencyId
+	agencyId,
+	existingAgencyId
 }) => {
 	const { existingFundingArr, newFundingArr } = createFundingArrays(
 		existingSubsidy.funding_sources,
 		newFundingSrc
 	);
-
-	const existingAgencyId = existingSubsidy.uploads[0].agency_id;
 
 	if (existingFundingArr.includes('HOME') && newFundingArr.includes('HOME')) {
 		console.log('Sent to update: Both HOME');
@@ -124,23 +130,31 @@ const deduplicateSubsidies = async props => {
 		if (existingSubId) {
 			const existingSubsidy = await getSubsidy(existingSubId);
 
+			const existingAgencyId =
+				existingSubsidy.uploads[existingSubsidy.uploads.length - 1].agency_id;
+
 			const { action } = existingSubsidy
 				? evaluateSubsidies({
 						existingSubsidy,
 						newSubsidy,
 						newFundingSrc,
-						agencyId
+						agencyId,
+						existingAgencyId
 				  })
 				: { action: 'insert' };
 
 			if (action === 'update') {
 				props.existingSubsidy = existingSubsidy;
-				const isUpdated = await updateSubsidy(props);
+				props.existingAgencyId = existingAgencyId;
 
-				return isUpdated;
+				const updateObj = await updateSubsidy(props);
+
+				return updateObj;
 			}
 
-			return action === 'reject' ? true : false;
+			return action === 'reject'
+				? { update: true, type: action, existingAgencyId }
+				: { update: false, type: action, existingAgencyId };
 		}
 	} catch (err) {
 		console.log(err);

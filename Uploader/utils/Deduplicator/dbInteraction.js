@@ -15,14 +15,16 @@ module.exports = {
 		updatedSubsidy,
 		dedupSubsidy,
 		uploadId,
-		newFundingSrc
+		newFundingSrc,
+		userId
 	}) {
 		try {
 			const { _id: newDedupId } = await db.DeduplicatedSubsidy.create({
 				...dedupSubsidy,
 				subsidy_id: subsidyId,
 				upload_id: uploadId,
-				funding_sources: Object.values(newFundingSrc).filter(value => value)
+				funding_sources: Object.values(newFundingSrc).filter(value => value),
+				user_id: userId
 			});
 
 			updatedSubsidy.deduplicated_subsidies.push(newDedupId);
