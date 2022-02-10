@@ -1,6 +1,8 @@
 const { getSubsidy, updateDuplicatedSubsidy } = require('./dbInteraction');
 const { getTime, createFundingArrays, isExactMatch } = require('./utils');
+const config = require('./config');
 const consolidateSubsidies = require('./consolidateSubsidies');
+// const { config } = require('dotenv');
 
 const updateSubsidy = async props => {
 	try {
@@ -13,6 +15,20 @@ const updateSubsidy = async props => {
 			existingAgencyId,
 			userId
 		} = props;
+
+		const originalSubObj = {};
+		if (!existingSubsidy.deduplicated_subsidies[0]) {
+			// set original sub before existing subsidy is updated if it has not been deduplicated before
+			[
+				...config.consolidateKeys,
+				'property_id',
+				'user_id',
+				'funding_sources',
+				'uploads'
+			].forEach(key => {
+				originalSubObj[key] = existingSubsidy[key];
+			});
+		}
 
 		const { existingFundingArr, newFundingArr } = createFundingArrays(
 			existingSubsidy.funding_sources,
@@ -69,11 +85,13 @@ const updateSubsidy = async props => {
 
 			await updateDuplicatedSubsidy({
 				subsidyId: existingSubsidy._id,
+				existingSubsidy: existingSubsidy,
 				updatedSubsidy: consolidatedSubsidy,
 				dedupSubsidy: newSubsidy,
 				uploadId,
 				newFundingSrc,
-				userId
+				userId,
+				originalSubObj
 			});
 		}
 

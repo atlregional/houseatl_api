@@ -1,8 +1,1 @@
-{
-	"2/4/2022": [
-		{
-			"addressProvided": "name: Castleberry Park, address: N/A, city: N/A, zip: N/A",
-			"text": "Geolocation error - Not enough info"
-		}
-	]
-}
+{"2/4/2022":[{"addressProvided":"name: Castleberry Park, address: N/A, city: N/A, zip: N/A","text":"Geolocation error - Not enough info"},{"addressProvided":"457 East Lake Dr, Decatur, GA 30030, USA","text":"Not in COA"},{"addressProvided":"name: Academy Lofts Adair Park, address: N/A, city: N/A, zip: N/A","text":"Geolocation error - Not enough info"},{"addressProvided":"name: QPP Definition - The longer of bonds outstanding, 15 years or HAP contract. (Comments), address: N/A, city: N/A, zip: N/A","text":"Geolocation error - Not enough info"}]}

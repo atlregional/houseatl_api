@@ -10,6 +10,10 @@ const {
 	handleCollectionsInsert
 } = require('./utils/dbInteraction');
 
+// const mongoURI = process.env.MONGODB_URI;
+const mongoURI = 'mongodb://localhost/houseatl';
+const dropFirst = true;
+
 const date = new Date();
 const todaysDate = `${
 	date.getMonth() + 1
@@ -17,6 +21,11 @@ const todaysDate = `${
 
 const init = async ({ directory, filename, sheet, user }) => {
 	try {
+		if (!user) {
+			console.log('Error: set user_id in .env');
+			console.log('Exiting...');
+			process.exit(1);
+		}
 		if (!directory || !filename) {
 			console.log('missing directory and/or filename arg(s)');
 			console.log('Exiting...');
@@ -63,18 +72,18 @@ const init = async ({ directory, filename, sheet, user }) => {
 			process.exit(1);
 		}
 
-		const dataArr = data
-			.filter(item => agencyObj.preFilter(item))
-			// ! Limiting Results for Testing -----------------------------
-			.slice(0, 20);
+		const dataArr = data.filter(item => agencyObj.preFilter(item));
+		// ! Limiting Results for Testing -----------------------------
+		// .slice(0, 20);
 		// console.log(dataArr);
 		const { userId, agencyId, uploadId } = await initializeDbUpload(
 			user,
 			agencyObj.agencyName,
 			filename,
-			false
+			dropFirst
 		);
 
+		// LIHTC dates - add
 		console.log(`Extracting data from ${dataArr.length} records...`);
 		const errorObj = {};
 
@@ -119,11 +128,8 @@ const init = async ({ directory, filename, sheet, user }) => {
 	}
 };
 
-// const uri = process.env.MONGODB_URI || 'mongodb://localhost/houseatl';
-const uri = 'mongodb://localhost/houseatl';
-
 mongoose
-	.connect(uri, {
+	.connect(mongoURI, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true
 	})

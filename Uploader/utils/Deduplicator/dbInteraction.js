@@ -1,4 +1,18 @@
 const db = require('../../../models');
+const config = require('./config');
+
+const createDedupSubAndAddToSubUpdate = async (updatedSubObj, newDedupObj) => {
+	try {
+		const { _id } = await db.DeduplicatedSubsidy.create(newDedupObj);
+		console.log('New deduplicated subsidy created');
+
+		updatedSubObj.deduplicated_subsidies.push(_id);
+
+		return updatedSubObj;
+	} catch (err) {
+		console.log(err);
+	}
+};
 
 module.exports = {
 	async getSubsidy(id) {
@@ -12,14 +26,25 @@ module.exports = {
 	},
 	async updateDuplicatedSubsidy({
 		subsidyId,
+		existingSubsidy,
 		updatedSubsidy,
 		dedupSubsidy,
 		uploadId,
 		newFundingSrc,
-		userId
+		userId,
+		originalSubObj
 	}) {
 		try {
-			const { _id: newDedupId } = await db.DeduplicatedSubsidy.create({
+			if (!existingSubsidy.deduplicated_subsidies[0]) {
+				updatedSubsidy = await createDedupSubAndAddToSubUpdate(updatedSubsidy, {
+					...originalSubObj,
+					funding_sources: originalSubObj.funding_sources.map(
+						({ source }) => source
+					)
+				});
+			}
+
+			updatedSubsidy = await createDedupSubAndAddToSubUpdate(updatedSubsidy, {
 				...dedupSubsidy,
 				subsidy_id: subsidyId,
 				upload_id: uploadId,
@@ -27,9 +52,8 @@ module.exports = {
 				user_id: userId
 			});
 
-			updatedSubsidy.deduplicated_subsidies.push(newDedupId);
-
 			await db.Subsidy.updateOne({ _id: subsidyId }, updatedSubsidy);
+			console.log('Subsidy updated');
 		} catch (err) {
 			console.log(err);
 		}

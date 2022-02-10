@@ -17,6 +17,8 @@ const PropertySchema = Schema(
 		neighborhood_planning_unit: { type: String },
 		tax_allocation_district: { type: String },
 		city_council_district: { type: String },
+		school_zone: { type: String },
+		high_school_zone: { type: String },
 		total_units: { type: Number },
 		owner_id: { type: Schema.Types.ObjectId, ref: 'owner' },
 		subsidies: [{ type: Schema.Types.ObjectId, ref: 'subsidy' }],

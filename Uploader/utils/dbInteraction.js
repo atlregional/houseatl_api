@@ -82,7 +82,10 @@ const handleUpdateType = async ({
 			if (existingOwner.name !== newOwnerObj.name)
 				await db.Owner.findByIdAndUpdate(existingOwner._id, ownerUpdateObj);
 
-			if (property.total_units !== newProperty.total_units)
+			if (
+				property.total_units !== newProperty.total_units &&
+				newProperty.total_units
+			)
 				await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
 
 			if (existingResident && residentUpdateObj)

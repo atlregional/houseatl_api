@@ -3,16 +3,41 @@ const apiKey = process.env.GOOGLE_API_KEY;
 const client = new Client();
 const turf = require('@turf/turf');
 const coaGeoJSON = require('../../geojsons/Cities_Georgia.json');
+const geojsonConfig = require('../config/geojsonConfig');
+
 const { handleError } = require('../config/errorConfig');
 
 let partialMatch = false;
 
-const turfHandler = propertyCoordinates => {
-	const COACoordinates = coaGeoJSON['features'][0]['geometry']['coordinates'];
-	const point = turf.point(propertyCoordinates);
-	const multiPoly = turf.multiPolygon(COACoordinates);
+const turfHandler = {
+	pointInCOA: async propertyCoordinates => {
+		const COACoordinates = coaGeoJSON['features'][0]['geometry']['coordinates'];
+		const point = turf.point(propertyCoordinates);
+		const multiPoly = turf.multiPolygon(COACoordinates);
 
-	return turf.booleanPointInPolygon(point, multiPoly);
+		return turf.booleanPointInPolygon(point, multiPoly);
+	},
+	getPropertiesFromGeoJSONs: async propertyCoordinates => {
+		const obj = {};
+		const point = turf.point(propertyCoordinates);
+
+		for (const config of Object.values(geojsonConfig)) {
+			for (const feature of config.geoJSON.features) {
+				const shape =
+					feature.geometry.type === 'Polygon'
+						? turf.polygon(feature.geometry.coordinates)
+						: turf.multiPolygon(feature.geometry.coordinates);
+
+				const pointInShape = turf.booleanPointInPolygon(point, shape);
+
+				if (pointInShape) {
+					obj[config.modelKey] = feature.properties[config.propertiesKey];
+					break;
+				}
+			}
+		}
+		return obj;
+	}
 };
 
 const mapDataToObjs = async (agencyObj, data) => {
@@ -137,7 +162,9 @@ const geocodeProperty = async ({
 			]
 		};
 
-		const isInCOA = turfHandler(obj['geometry']['coordinates']);
+		const isInCOA = await turfHandler.pointInCOA(
+			obj['geometry']['coordinates']
+		);
 
 		if (!isInCOA) {
 			const { data, error } = handleError(obj['address'], 'Not in COA');
@@ -148,7 +175,11 @@ const geocodeProperty = async ({
 			};
 		}
 
-		return { geocodedObj: obj, error: error };
+		const geojsonPropertiesObj = await turfHandler.getPropertiesFromGeoJSONs(
+			obj['geometry']['coordinates']
+		);
+
+		return { geocodedObj: { ...obj, ...geojsonPropertiesObj }, error: error };
 	} else {
 		return { geocodedObj: data, error };
 	}
@@ -159,7 +190,6 @@ const createDataObj = async (agencyObj, item) => {
 		await mapDataToObjs(agencyObj, item);
 
 	const { geocodedObj, error } = await geocodeProperty(Property);
-
 	// ! use empty geocodedObj to not use GoogleMaps API
 	// const geocodedObj = {};
 	// const error = false;

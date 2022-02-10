@@ -59,6 +59,214 @@
 		{
 			"addressProvided": "150 10th St NE, Atlanta, GA 30309, USA",
 			"text": "No start date- Juniper & 10th"
+		},
+		{
+			"addressProvided": "1044 Hank Aaron Dr SE, Atlanta, GA 30315, USA",
+			"text": "No start date- Boyton Village"
+		},
+		{
+			"addressProvided": "2229 Flat Shoals Rd SE, Atlanta, GA 30316, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "879 Rock St NW, Atlanta, GA 30314, USA",
+			"text": "No start date- Quest Village III"
+		},
+		{
+			"addressProvided": "2239 Flat Shoals Rd SE, Atlanta, GA 30316, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "1901 Myrtle Dr SW, Atlanta, GA 30311, USA",
+			"text": "No start date- Baptist Gardens"
+		},
+		{
+			"addressProvided": "2282 Johnson Ferry Rd NE, Atlanta, GA 30319, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "1311 E Cleveland Ave, East Point, GA 30344, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "1881 Myrtle Dr SW, Atlanta, GA 30311, USA",
+			"text": "No start date- Baptist Towers"
+		},
+		{
+			"addressProvided": "2045 Graham Cir SE, Atlanta, GA 30316, USA",
+			"text": "No start date- Summit Trail"
+		},
+		{
+			"addressProvided": "234 Memorial Dr SW, Atlanta, GA 30303, USA",
+			"text": "No start date- Welcome House"
+		},
+		{
+			"addressProvided": "3521 Blair Cir NE, Atlanta, GA 30319, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "4725 Walton Crossing SW, Atlanta, GA 30331, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "3522 Blair Cir NE, Atlanta, GA 30319, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "555 McDaniel St SW, Atlanta, GA 30312, USA",
+			"text": "No start date- Mechanicsville Sr. Residences"
+		},
+		{
+			"addressProvided": "200 Vineyard Walk, Atlanta, GA 30316, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "2981 Springdale Rd SW, Atlanta, GA 30315, USA",
+			"text": "No start date- Heritage Green"
+		},
+		{
+			"addressProvided": "14 Meldon Ave SE, Atlanta, GA 30315, USA",
+			"text": "No start date- Columbia Blackshear Sr. Residences"
+		},
+		{
+			"addressProvided": "387 Joseph E Lowery Blvd SW, Atlanta, GA 30310, USA",
+			"text": "No start date- Ashley College Town"
+		},
+		{
+			"addressProvided": "751 Fairburn Rd SW, Atlanta, GA 30331, USA",
+			"text": "No start date- Villas of Princeton Lakes"
+		},
+		{
+			"addressProvided": "490 Glen Street",
+			"text": "Geolocation error - Partial address match"
+		},
+		{
+			"addressProvided": "4171 Washington Rd, Atlanta, GA 30344, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "2611 Springdale Rd SW, Atlanta, GA 30315, USA",
+			"text": "No start date- Trinity Towers"
+		},
+		{
+			"addressProvided": "2051 Flat Shoals Rd, Atlanta, GA 30316, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "565 St Johns Ave SW, Atlanta, GA 30315, USA",
+			"text": "No start date- Brookside Park"
+		},
+		{
+			"addressProvided": "1900 Perry Blvd NW, Atlanta, GA 30318, USA",
+			"text": "No start date- Columbia Heritage Sr. Residences"
+		},
+		{
+			"addressProvided": "921 Westmoreland Cir NW, Atlanta, GA 30318, USA",
+			"text": "No start date- Columbia Park Citi Residences"
+		},
+		{
+			"addressProvided": "1620 Hollywood Rd NW, Atlanta, GA 30318, USA",
+			"text": "No start date- Dwell at the View"
+		},
+		{
+			"addressProvided": "7250 Campbellton Rd SW, Atlanta, GA 30331, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "921 Myrtle St NE, Atlanta, GA 30309, USA",
+			"text": "No start date- Myrtle Street"
+		},
+		{
+			"addressProvided": "309 Mount Zion Rd SW, Atlanta, GA 30354, USA",
+			"text": "No start date- Legacy Village"
+		},
+		{
+			"addressProvided": "2025 Peachtree Rd, Atlanta, GA 30309, USA",
+			"text": "No start date- The Lofts at Twenty25"
+		},
+		{
+			"addressProvided": "174 Moury Ave SE, Atlanta, GA 30315, USA",
+			"text": "No start date- Villages At Carver III"
+		},
+		{
+			"addressProvided": "4900 Delano Rd, Atlanta, GA 30349, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "460 East Lake Dr, Decatur, GA 30030, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "460 East Lake Dr, Decatur, GA 30030, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "2527 Skyland Dr NE, Brookhaven, GA 30319, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "835 Oglethorpe Ave SW, Atlanta, GA 30310, USA",
+			"text": "No start date- West End Housing Development"
+		},
+		{
+			"addressProvided": "9100 Cascade Palmetto Hwy, Palmetto, GA 30268, USA",
+			"text": "Not in COA"
+		},
+		{
+			"addressProvided": "265 Kirkwood Rd NE, Atlanta, GA 30317, USA",
+			"text": "No start date- Presley Woods"
+		},
+		{
+			"addressProvided": "2370 Metropolitan Pkwy SW, Atlanta, GA 30315, USA",
+			"text": "No start date- Santa Fe Villas"
+		},
+		{
+			"addressProvided": "1870 Campbellton Rd SW, Atlanta, GA 30311, USA",
+			"text": "No start date- QLS Gardens"
+		},
+		{
+			"addressProvided": "440 Markham St SW, Atlanta, GA 30313, USA",
+			"text": "No start date- Northside Plaza Apartments"
+		},
+		{
+			"addressProvided": "Love St SW, Atlanta, GA 30315, USA",
+			"text": "No start date- Reed Street Apartments"
+		},
+		{
+			"addressProvided": "187 Edgewood Ave SE, Atlanta, GA 30303, USA",
+			"text": "No start date- Edgewood Center"
+		},
+		{
+			"addressProvided": "3000 Stone Hogan Conn SW, Atlanta, GA 30331, USA",
+			"text": "No start date- Greenbriar Commons"
+		},
+		{
+			"addressProvided": "1599 Pryor Rd SW, Atlanta, GA 30315, USA",
+			"text": "No start date- Thornton Place Apartments"
+		},
+		{
+			"addressProvided": "1700 Giben Rd SW, Atlanta, GA 30315, USA",
+			"text": "No start date- Amal Heights II"
+		},
+		{
+			"addressProvided": "2500 Center St NW, Atlanta, GA 30318, USA",
+			"text": "No start date- Rolling Bends II"
+		},
+		{
+			"addressProvided": "526 Centennial Olympic Park Dr NW, Atlanta, GA 30313, USA",
+			"text": "No start date- Centennial Place IV"
+		},
+		{
+			"addressProvided": "234 Memorial Dr SW, Atlanta, GA 30303, USA",
+			"text": "No start date- Welcome House"
+		},
+		{
+			"addressProvided": "174 Moury Ave SE, Atlanta, GA 30315, USA",
+			"text": "No start date- Villages At Carver III"
+		},
+		{
+			"addressProvided": "9100 Cascade Palmetto Hwy, Palmetto, GA 30268, USA",
+			"text": "Not in COA"
 		}
 	]
 }
