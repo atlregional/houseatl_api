@@ -1,8 +1,1 @@
-{
-	"2/7/2022": [
-		{
-			"addressProvided": "546 Morgan St NE, Atlanta, GA 30308, USA",
-			"text": "No start date- "
-		}
-	]
-}
+{"2/10/2022":[{"addressProvided":"684 & 258 Jimmy Dean Pkwy, Atlanta, GA 30312","text":"Geolocation error - Partial address match"},{"addressProvided":"655 Highland Ave NE, Atlanta, GA 30312","text":"No start date- Test"}]}

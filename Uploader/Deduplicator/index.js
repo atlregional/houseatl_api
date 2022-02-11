@@ -1,7 +1,11 @@
-const { getSubsidy, updateDuplicatedSubsidy } = require('./dbInteraction');
+const {
+	getSubsidy,
+	updateDuplicatedSubsidy
+} = require('./db/deduplicatorControllers');
+
 const { getTime, createFundingArrays, isExactMatch } = require('./utils');
-const config = require('./config');
-const consolidateSubsidies = require('./consolidateSubsidies');
+const configArrays = require('../config/configArrays');
+const consolidateSubsidies = require('./Consolidator');
 // const { config } = require('dotenv');
 
 const updateSubsidy = async props => {
@@ -20,7 +24,8 @@ const updateSubsidy = async props => {
 		if (!existingSubsidy.deduplicated_subsidies[0]) {
 			// set original sub before existing subsidy is updated if it has not been deduplicated before
 			[
-				...config.consolidateKeys,
+				...configArrays.consolidateKeys,
+				...configArrays.dateKeys,
 				'property_id',
 				'user_id',
 				'funding_sources',
@@ -44,36 +49,28 @@ const updateSubsidy = async props => {
 			getTime(newSubsidy.end_date) > getTime(existingSubsidy.end_date) &&
 			agencyId.toString() === existingAgencyId.toString()
 		) {
-			console.log(
-				'Duplicate. Updating all fields. Creating deduplicated record.'
-			);
+			console.log('Duplicate: update all');
 		} else if (
 			existingFundingArr.includes('HOME') &&
 			newFundingArr.includes('HOME') &&
 			agencyId.toString() === existingAgencyId.toString()
 		) {
-			console.log(
-				'Duplicate. Updating null fields. Creating deduplicated record.'
-			);
+			console.log('Duplicate: update null');
 			configObj.type = 'update_null';
 		} else if (
 			existingFundingArr.includes('HOME') &&
 			newFundingArr.includes('HOME')
 		) {
-			console.log('Update Rejected: not a duplicate. Creating new record.');
+			console.log('Rejected: create new record');
 			configObj.update = false;
 			configObj.type = null;
 		} else if (
 			getTime(newSubsidy.start_date) > getTime(existingSubsidy.start_date) &&
 			getTime(newSubsidy.end_date) > getTime(existingSubsidy.end_date)
 		) {
-			console.log(
-				'Duplicate. Updating all fields. Creating deduplicated record.'
-			);
+			console.log('Duplicate: update all');
 		} else {
-			console.log(
-				'Duplicate. Updating based on hierarchy. Creating deduplicated record.'
-			);
+			console.log('Duplicate: update hierarchy');
 			configObj.type = 'update_hierarchy';
 		}
 
@@ -114,18 +111,18 @@ const evaluateSubsidies = ({
 	);
 
 	if (existingFundingArr.includes('HOME') && newFundingArr.includes('HOME')) {
-		console.log('Sent to update: Both HOME');
+		console.log('Update: Both HOME');
 		return { action: 'update' };
 	} else if (
 		JSON.stringify(existingFundingArr) !== JSON.stringify(newFundingArr)
 	) {
-		console.log('Not a duplicate: Funding does not match - Create new record');
+		console.log('Reject: create new record');
 		return { action: 'create' };
 	} else if (isExactMatch(existingSubsidy, newSubsidy)) {
-		console.log('Exact Match: Reject record');
+		console.log('Reject: exact match');
 		return { action: 'reject' };
 	} else if (existingAgencyId.toString() !== agencyId.toString()) {
-		console.log('Sent to update: No agency match');
+		console.log('Update: no agency match');
 		return { action: 'update' };
 	} else if (
 		getTime(existingSubsidy.start_date) === getTime(newSubsidy.start_date) ||
@@ -133,10 +130,10 @@ const evaluateSubsidies = ({
 		getTime(newSubsidy.start_date) > getTime(existingSubsidy.start_date) ||
 		getTime(newSubsidy.end_date) > getTime(existingSubsidy.end_date)
 	) {
-		console.log('Sent to update: Dates');
+		console.log('Update: dates');
 		return { action: 'update' };
 	} else {
-		console.log('No case met in evaluator: Reject record');
+		console.log('Reject: no case met');
 		return { action: 'reject' };
 	}
 };

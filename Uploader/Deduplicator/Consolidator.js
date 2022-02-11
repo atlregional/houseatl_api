@@ -1,8 +1,9 @@
-const config = require('./config');
-const { getTime, handleDateLIHTC } = require('./utils');
-const { getAgenciesForHierarchyCompare } = require('./dbInteraction');
+const { getTime } = require('./utils');
+const { handleDateLIHTC } = require('../utils');
+const { getAgenciesForHierarchyCompare } = require('../db/helpers');
+const configArrays = require('../config/configArrays');
 
-const consolidateSubsidies = async ({
+const Consolidator = async ({
 	type,
 	existingSubsidy,
 	newSubsidy,
@@ -12,19 +13,21 @@ const consolidateSubsidies = async ({
 }) => {
 	switch (type) {
 		case 'update_null':
-			[...config.consolidateKeys, ...config.dateKeys].forEach(key => {
-				if (
-					(!existingSubsidy[key] && newSubsidy[key]) ||
-					(config.dateKeys.includes(key) &&
-						existingSubsidy[key] &&
-						newSubsidy[key] &&
-						getTime(newSubsidy[key]) > getTime(existingSubsidy[key]))
-				)
-					existingSubsidy[key] = newSubsidy[key];
-			});
+			[...configArrays.consolidateKeys, ...configArrays.dateKeys].forEach(
+				key => {
+					if (
+						(!existingSubsidy[key] && newSubsidy[key]) ||
+						(configArrays.dateKeys.includes(key) &&
+							existingSubsidy[key] &&
+							newSubsidy[key] &&
+							getTime(newSubsidy[key]) > getTime(existingSubsidy[key]))
+					)
+						existingSubsidy[key] = newSubsidy[key];
+				}
+			);
 			break;
 		case 'update_all':
-			[...config.consolidateKeys, ...config.dateKeys].forEach(
+			[...configArrays.consolidateKeys, ...configArrays.dateKeys].forEach(
 				key => (existingSubsidy[key] = newSubsidy[key])
 			);
 			break;
@@ -35,12 +38,12 @@ const consolidateSubsidies = async ({
 					agencyId
 				);
 
-			config.consolidateKeys.forEach(key => {
+			configArrays.consolidateKeys.forEach(key => {
 				if (
 					(!existingSubsidy[key] && newSubsidy[key]) ||
 					(newSubsidy[key] &&
-						config.agencyHierarchy.indexOf(newAgency) <
-							config.agencyHierarchy.indexOf(existingAgency))
+						configArrays.agencyHierarchy.indexOf(newAgency) <
+							configArrays.agencyHierarchy.indexOf(existingAgency))
 				)
 					existingSubsidy[key] = newSubsidy[key];
 			});
@@ -67,7 +70,7 @@ const consolidateSubsidies = async ({
 					existingSubsidy.start_date
 				);
 			} else {
-				config.dateKeys.forEach(key => {
+				configArrays.dateKeys.forEach(key => {
 					if (
 						existingSubsidy[key] &&
 						newSubsidy[key] &&
@@ -77,7 +80,6 @@ const consolidateSubsidies = async ({
 					}
 				});
 			}
-
 			break;
 		default:
 			break;
@@ -96,4 +98,4 @@ const consolidateSubsidies = async ({
 	return existingSubsidy;
 };
 
-module.exports = consolidateSubsidies;
+module.exports = Consolidator;

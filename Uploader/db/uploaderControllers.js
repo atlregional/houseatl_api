@@ -1,9 +1,8 @@
 const db = require('../../models');
-const deduplicatorConfig = require('./Deduplicator/config');
-const deduplicateSubsidies = require('./Deduplicator/deduplicateSubsidies');
-const {
-	getAgenciesForHierarchyCompare
-} = require('./Deduplicator/dbInteraction');
+const configArrays = require('../config/configArrays');
+const deduplicateSubsidies = require('../Deduplicator');
+const { handleDateLIHTC } = require('../utils');
+const { getAgenciesForHierarchyCompare } = require('./helpers');
 
 const handleNewRecord = async ({
 	newSubsidy,
@@ -15,6 +14,13 @@ const handleNewRecord = async ({
 	uploadId
 }) => {
 	try {
+		if (
+			Object.values(newFundingSrc).includes('LIHTC') &&
+			newSubsidy.start_date
+		) {
+			newSubsidy = handleDateLIHTC(newSubsidy, newSubsidy.start_date);
+		}
+
 		const dbSubsidy = await db.Subsidy.create({
 			...newSubsidy,
 			property_id: propertyId,
@@ -107,8 +113,8 @@ const handleUpdateType = async ({
 					uploadId
 				);
 			const newAgencyHasPriority =
-				deduplicatorConfig.agencyHierarchy.indexOf(newAgency) <
-				deduplicatorConfig.agencyHierarchy.indexOf(existingAgency);
+				configArrays.agencyHierarchy.indexOf(newAgency) <
+				configArrays.agencyHierarchy.indexOf(existingAgency);
 
 			if (
 				(!existingOwner.name && newOwnerObj.name) ||
@@ -199,8 +205,8 @@ const handleDuplicatesAndUpdate = async props => {
 		const { update, type, existingAgencyId } = await deduplicateSubsidies(
 			props
 		);
-
 		console.log('Subsidy deduplicated and updated.');
+
 		updateObj.updated = update;
 		updateObj.type = type;
 		updateObj.existingAgencyId = existingAgencyId;

@@ -2,10 +2,10 @@ const { Client } = require('@googlemaps/google-maps-services-js');
 const apiKey = process.env.GOOGLE_API_KEY;
 const client = new Client();
 const turf = require('@turf/turf');
-const coaGeoJSON = require('../../geojsons/Cities_Georgia.json');
-const geojsonConfig = require('../config/geojsonConfig');
+const coaGeoJSON = require('../geojsons/Cities_Georgia.json');
+const geojsonConfig = require('./config/geojsonConfig');
 
-const { handleError } = require('../config/errorConfig');
+const { handleError } = require('./config/errorConfig');
 
 let partialMatch = false;
 
@@ -38,16 +38,6 @@ const turfHandler = {
 		}
 		return obj;
 	}
-};
-
-const mapDataToObjs = async (agencyObj, data) => {
-	const obj = {};
-
-	agencyObj.getCollectionsArr().forEach(collection => {
-		obj[collection] = agencyObj.createCollectionObj(collection, data);
-	});
-
-	return obj;
 };
 
 const clientHandler = async ({
@@ -110,7 +100,7 @@ const clientHandler = async ({
 	}
 };
 
-const geocodeProperty = async ({
+const Geocoder = async ({
 	name,
 	original_address,
 	city,
@@ -185,31 +175,4 @@ const geocodeProperty = async ({
 	}
 };
 
-const createDataObj = async (agencyObj, item) => {
-	const { Property, Subsidy, Owner, Resident, Funding_Source } =
-		await mapDataToObjs(agencyObj, item);
-
-	const { geocodedObj, error } = await geocodeProperty(Property);
-	// ! use empty geocodedObj to not use GoogleMaps API
-	// const geocodedObj = {};
-	// const error = false;
-
-	if (!error) {
-		const propertyObj = { ...Property, ...geocodedObj };
-
-		return {
-			Property: propertyObj,
-			Subsidy,
-			Owner,
-			Resident,
-			Funding_Source,
-			Error: ''
-		};
-	} else {
-		return {
-			Error: geocodedObj
-		};
-	}
-};
-
-module.exports = createDataObj;
+module.exports = Geocoder;

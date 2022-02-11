@@ -2,13 +2,13 @@ require('dotenv').config();
 const fs = require('fs');
 const mongoose = require('mongoose');
 const agencyConfig = require('./config/agencyConfig');
-const createDataObj = require('./utils/createDataObj');
-// const { deduplicateSubsidies } = require('./utils/deduplicateSubsidies');
-const { handleError } = require('./config/errorConfig');
+const Geocoder = require('./Geocoder');
 const {
 	initializeDbUpload,
 	handleCollectionsInsert
-} = require('./utils/dbInteraction');
+} = require('./db/uploaderControllers');
+const { createDataObj } = require('./utils');
+const { handleError } = require('./config/errorConfig');
 
 // const mongoURI = process.env.MONGODB_URI;
 const mongoURI = 'mongodb://localhost/houseatl';
@@ -83,24 +83,24 @@ const init = async ({ directory, filename, sheet, user }) => {
 			dropFirst
 		);
 
-		// LIHTC dates - add
 		console.log(`Extracting data from ${dataArr.length} records...`);
 		const errorObj = {};
 
 		for await (const item of dataArr) {
-			const { Property, Subsidy, Owner, Resident, Funding_Source, Error } =
-				await createDataObj(agencyObj, item);
+			const { Property, Subsidy, Owner, Resident, Funding_Source } =
+				createDataObj(agencyObj, item);
 
-			if (!Error && Subsidy.start_date) {
-				// console.log({ Property, Subsidy, Owner, Resident, Funding_Source });
+			const { geocodedObj, error } = await Geocoder(Property);
+
+			if (!error && Subsidy.start_date) {
 				await handleCollectionsInsert(userId, agencyId, uploadId, {
 					Owner,
-					Property,
+					Property: { ...Property, ...geocodedObj },
 					Subsidy,
 					Funding_Source,
 					Resident
 				});
-			} else if (!Error && !Subsidy.start_date) {
+			} else if (!error && !Subsidy.start_date) {
 				// If no start_date front end throws an error referencing project_name
 				const { data } = handleError(
 					Property.address || Property.original_address,
@@ -110,10 +110,10 @@ const init = async ({ directory, filename, sheet, user }) => {
 				!errorObj[todaysDate]
 					? (errorObj[todaysDate] = [data])
 					: errorObj[todaysDate].push(data);
-			} else if (Error) {
+			} else if (error) {
 				!errorObj[todaysDate]
-					? (errorObj[todaysDate] = [Error])
-					: errorObj[todaysDate].push(Error);
+					? (errorObj[todaysDate] = [geocodedObj])
+					: errorObj[todaysDate].push(geocodedObj);
 			}
 		}
 
