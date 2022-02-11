@@ -23,5 +23,19 @@ module.exports = {
 			if (existingValue !== newValue) exactMatch = false;
 		});
 		return exactMatch;
+	},
+	handleProjectNameUpdate(existingProjectName, newProjectName) {
+		const existingTestStr = existingProjectName.toUpperCase();
+		const newTestStr = newProjectName.toUpperCase();
+
+		if (
+			existingProjectName &&
+			newProjectName &&
+			!existingTestStr.includes(newTestStr)
+		)
+			return existingProjectName.concat(' & ', newProjectName);
+		else if (!newProjectName || existingTestStr.includes(newTestStr))
+			return existingProjectName;
+		else return newProjectName;
 	}
 };

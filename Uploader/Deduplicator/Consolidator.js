@@ -1,4 +1,4 @@
-const { getTime } = require('./utils');
+const { getTime, handleProjectNameUpdate } = require('./utils');
 const { handleDateLIHTC } = require('../utils');
 const { getAgenciesForHierarchyCompare } = require('../db/helpers');
 const configArrays = require('../config/configArrays');
@@ -28,7 +28,14 @@ const Consolidator = async ({
 			break;
 		case 'update_all':
 			[...configArrays.consolidateKeys, ...configArrays.dateKeys].forEach(
-				key => (existingSubsidy[key] = newSubsidy[key])
+				key => {
+					if (key === 'project_name') {
+						existingSubsidy[key] = handleProjectNameUpdate(
+							existingSubsidy[key],
+							newSubsidy[key]
+						);
+					} else existingSubsidy[key] = newSubsidy[key];
+				}
 			);
 			break;
 		case 'update_hierarchy':
@@ -39,7 +46,12 @@ const Consolidator = async ({
 				);
 
 			configArrays.consolidateKeys.forEach(key => {
-				if (
+				if (key === 'project_name')
+					existingSubsidy[key] = handleProjectNameUpdate(
+						existingSubsidy[key],
+						newSubsidy[key]
+					);
+				else if (
 					(!existingSubsidy[key] && newSubsidy[key]) ||
 					(newSubsidy[key] &&
 						configArrays.agencyHierarchy.indexOf(newAgency) <

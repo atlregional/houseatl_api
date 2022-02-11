@@ -56,7 +56,7 @@ const handleNewRecord = async ({
 		}
 
 		for await (const item of newResidentArr) {
-			if (item) {
+			if (item || item.toUpperCase() !== 'RENTER') {
 				await db.Resident.create({
 					type: item,
 					subsidy_id: dbSubsidy._id,
@@ -94,7 +94,11 @@ const handleUpdateType = async ({
 			)
 				await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
 
-			if (existingResident && residentUpdateObj)
+			if (
+				existingResident &&
+				residentUpdateObj &&
+				residentUpdateObj.type.toUpperCase() !== 'RENTER'
+			)
 				db.Resident.findByIdAndUpdate(existingResident._id, residentUpdateObj);
 			break;
 
@@ -128,7 +132,12 @@ const handleUpdateType = async ({
 			)
 				await db.Property.findByIdAndUpdate(property._id, propertyUpdateObj);
 
-			if (existingResident && residentUpdateObj && newAgencyHasPriority)
+			if (
+				existingResident &&
+				residentUpdateObj &&
+				residentUpdateObj.type.toUpperCase() !== 'RENTER' &&
+				newAgencyHasPriority
+			)
 				await db.Resident.findByIdAndUpdate(
 					existingResident._id,
 					residentUpdateObj
@@ -167,7 +176,11 @@ const updateRelatedCollections = async props => {
 			subsidy_id: updateObj.existingSubId
 		}))[0];
 
-	if (!existingResident && residentUpdateObj)
+	if (
+		!existingResident &&
+		residentUpdateObj &&
+		residentUpdateObj.type.toUpperCase() !== 'RENTER'
+	)
 		db.Resident.create({
 			...residentUpdateObj,
 			uploads: [uploadId],
