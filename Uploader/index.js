@@ -8,10 +8,12 @@ const {
 	handleCollectionsInsert
 } = require('./db/uploaderControllers');
 const { createDataObj } = require('./utils');
-const { handleError } = require('./config/errorConfig');
 
-// const mongoURI = process.env.MONGODB_URI;
-const mongoURI = 'mongodb://localhost/houseatl';
+const mongoURI = process.env.MONGODB_URI;
+// const mongoURI = 'mongodb://localhost/houseatl';
+const user = process.env.user_id;
+// const user = process.env.dev_user_id;
+
 const dropFirst = true;
 
 const date = new Date();
@@ -92,7 +94,7 @@ const init = async ({ directory, filename, sheet, user }) => {
 
 			const { geocodedObj, error } = await Geocoder(Property);
 
-			if (!error && Subsidy.start_date) {
+			if (!error) {
 				await handleCollectionsInsert(userId, agencyId, uploadId, {
 					Owner,
 					Property: { ...Property, ...geocodedObj },
@@ -100,17 +102,7 @@ const init = async ({ directory, filename, sheet, user }) => {
 					Funding_Source,
 					Resident
 				});
-			} else if (!error && !Subsidy.start_date) {
-				// If no start_date front end throws an error referencing project_name
-				const { data } = handleError(
-					Property.address || Property.original_address,
-					`No start date- ${Subsidy.project_name}`
-				);
-
-				!errorObj[todaysDate]
-					? (errorObj[todaysDate] = [data])
-					: errorObj[todaysDate].push(data);
-			} else if (error) {
+			} else {
 				!errorObj[todaysDate]
 					? (errorObj[todaysDate] = [geocodedObj])
 					: errorObj[todaysDate].push(geocodedObj);
@@ -135,10 +127,10 @@ mongoose
 	})
 	.then(async () => {
 		await init({
+			user,
 			directory: process.argv[2],
 			filename: process.argv[3],
-			sheet: process.argv[4],
-			user: process.env.user_id
+			sheet: process.argv[4]
 		});
 		console.log('Process complete.');
 		process.exit(0);

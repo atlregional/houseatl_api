@@ -24,6 +24,13 @@ const helpers = {
 		if (type === 'month' || type === 'day') return `0${value}`;
 
 		if (type === 'year') return `20${value}`;
+	},
+	filterByCityAndAcceptedFundingArr({
+		cityVal,
+		fundingVal,
+		acceptedFundingArr
+	}) {
+		return cityVal === 'ATLANTA' && acceptedFundingArr.includes(fundingVal);
 	}
 };
 
@@ -129,27 +136,40 @@ module.exports = {
 		...initialMethods,
 		agencyName: 'Georgia Department of Community Affairs',
 		cityKey: 'City',
-		xlsxRange: 2
+		fundingSrcNameKey: 'Primary Funding Source',
+		acceptedFundingSrc: ['LIHTC'],
+		xlsxRange: 2,
+		preFilter(obj) {
+			if (obj[this.fundingSrcNameKey] && obj[this.cityKey])
+				return helpers.filterByCityAndAcceptedFundingArr({
+					cityVal: obj[this.cityKey].toUpperCase(),
+					fundingVal: obj[this.fundingSrcNameKey],
+					acceptedFundingArr: this.acceptedFundingSrc
+				});
+			else if (obj[this.cityKey])
+				return obj[this.cityKey].toUpperCase() === 'ATLANTA';
+
+			return false;
+		}
 	},
 	NHPD: {
 		...initialMethods,
 		agencyName: 'National Housing Preservation Database',
 		cityKey: 'City',
+		fundingSrcNameKey: 'Subsidy Name',
+		acceptedFundingSrc: ['HOME', 'Section 8', 'Section 202', 'Public Housing'],
 		xlsxRange: 0,
 		preFilter(obj) {
-			const acceptedTypes = [
-				'HOME',
-				'Section 8',
-				'Section 202',
-				'Public Housing'
-			];
-			if (obj['Subsidy Name']) {
-				return (
-					obj[this.cityKey].toUpperCase() === 'ATLANTA' &&
-					acceptedTypes.includes(obj['Subsidy Name'])
-				);
-			}
-			return obj[this.cityKey].toUpperCase() === 'ATLANTA';
+			if (obj[this.fundingSrcNameKey] && obj[this.cityKey]) {
+				return helpers.filterByCityAndAcceptedFundingArr({
+					cityVal: obj[this.cityKey].toUpperCase(),
+					fundingVal: obj[this.fundingSrcNameKey],
+					acceptedFundingArr: this.acceptedFundingSrc
+				});
+			} else if (obj[this.cityKey])
+				return obj[this.cityKey].toUpperCase() === 'ATLANTA';
+
+			return false;
 		}
 	},
 	InvestAtlanta: {

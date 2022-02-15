@@ -89,7 +89,8 @@ module.exports = {
 			project_name: 'Property Name',
 			development_type: 'New Construction or Acq./Rehab',
 			start_date: 'First PIS',
-			end_date: 'End of Compliance Period w/o LURC yrs added',
+			end_date: 'End of Extended Use Period',
+			risk_of_exp: 'End of Compliance Period w/o LURC yrs added',
 			ami_30: '',
 			ami_50: '',
 			ami_60: '',
@@ -103,9 +104,11 @@ module.exports = {
 			type_1: 'Tenancy',
 			type_2: ''
 		},
+		// Only take LIHTC from DCA
 		Funding_Source: {
 			source_1: 'Primary Funding Source',
-			source_2: 'Secondary Funding Source'
+			source_2: ''
+			// source_2: 'Secondary Funding Source'
 		}
 	},
 	'City of Atlanta': {

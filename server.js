@@ -26,8 +26,11 @@ app.use((req, res, next) => {
 
 app.use(routes);
 
+// const mongoURI = 'mongodb://localhost/houseatl';
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/houseatl';
+
 mongoose
-	.connect(process.env.MONGODB_URI || 'mongodb://localhost/houseatl', {
+	.connect(mongoURI, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true
 	})

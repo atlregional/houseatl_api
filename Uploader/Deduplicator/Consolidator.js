@@ -29,12 +29,7 @@ const Consolidator = async ({
 		case 'update_all':
 			[...configArrays.consolidateKeys, ...configArrays.dateKeys].forEach(
 				key => {
-					if (key === 'project_name') {
-						existingSubsidy[key] = handleProjectNameUpdate(
-							existingSubsidy[key],
-							newSubsidy[key]
-						);
-					} else existingSubsidy[key] = newSubsidy[key];
+					existingSubsidy[key] = newSubsidy[key];
 				}
 			);
 			break;
@@ -45,53 +40,30 @@ const Consolidator = async ({
 					agencyId
 				);
 
+			const newDataHasPriority =
+				configArrays.agencyHierarchy.indexOf(newAgency) <
+				configArrays.agencyHierarchy.indexOf(existingAgency);
+
 			configArrays.consolidateKeys.forEach(key => {
-				if (key === 'project_name')
-					existingSubsidy[key] = handleProjectNameUpdate(
-						existingSubsidy[key],
-						newSubsidy[key]
-					);
-				else if (
+				if (
 					(!existingSubsidy[key] && newSubsidy[key]) ||
-					(newSubsidy[key] &&
-						configArrays.agencyHierarchy.indexOf(newAgency) <
-							configArrays.agencyHierarchy.indexOf(existingAgency))
+					(newSubsidy[key] && newDataHasPriority)
 				)
 					existingSubsidy[key] = newSubsidy[key];
 			});
 
-			const isLIHTC = existingSubsidy.funding_sources
-				.map(({ source }) => source)
-				.includes('LIHTC');
-
-			if (
-				isLIHTC &&
-				newSubsidy.start_date &&
-				existingSubsidy.start_date &&
-				getTime(newSubsidy.start_date) > getTime(existingSubsidy.start_date)
-			) {
-				existingSubsidy.start_date = newSubsidy.start_date;
-
-				existingSubsidy = handleDateLIHTC(
-					existingSubsidy,
-					newSubsidy.start_date
-				);
-			} else if (isLIHTC && existingSubsidy.start_date) {
-				existingSubsidy = handleDateLIHTC(
-					existingSubsidy,
-					existingSubsidy.start_date
-				);
-			} else {
-				configArrays.dateKeys.forEach(key => {
-					if (
-						existingSubsidy[key] &&
+			configArrays.dateKeys.forEach(key => {
+				if (
+					(!existingSubsidy[key] && newSubsidy[key]) ||
+					(newSubsidy[key] && newDataHasPriority) ||
+					(existingSubsidy[key] &&
 						newSubsidy[key] &&
-						getTime(newSubsidy[key]) > getTime(existingSubsidy[key])
-					) {
-						existingSubsidy[key] = newSubsidy[key];
-					}
-				});
-			}
+						getTime(newSubsidy[key]) > getTime(existingSubsidy[key]))
+				) {
+					existingSubsidy[key] = newSubsidy[key];
+				}
+			});
+
 			break;
 		default:
 			break;

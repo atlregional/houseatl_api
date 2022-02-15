@@ -1,1 +1,1 @@
-{"2/10/2022":[{"addressProvided":"684 & 258 Jimmy Dean Pkwy, Atlanta, GA 30312","text":"Geolocation error - Partial address match"},{"addressProvided":"655 Highland Ave NE, Atlanta, GA 30312","text":"No start date- Test"}]}
+{"2/15/2022":[{"addressProvided":"684 & 258 Jimmy Dean Pkwy, Atlanta, GA 30312","text":"Geocoder: Potential address error (addresses do not match) - Returned address: 303 Parkway Dr NE, Atlanta, GA 30312, USA"},{"addressProvided":"Multi-site 30314","text":"Geocoder: Address error - Returned Address: Atlanta, GA 30314, USA"}]}

@@ -4,6 +4,10 @@ const client = new Client();
 const turf = require('@turf/turf');
 const coaGeoJSON = require('../geojsons/Cities_Georgia.json');
 const geojsonConfig = require('./config/geojsonConfig');
+const {
+	configureAddressStr,
+	configurePartialMatchAddress
+} = require('./utils');
 
 const { handleError } = require('./config/errorConfig');
 
@@ -43,21 +47,26 @@ const turfHandler = {
 const clientHandler = async ({
 	name,
 	original_address,
+	updated_address,
 	city,
 	zip,
 	latitude,
 	longitude
 }) => {
-	// If partial match is true, data contains lat and lng
-	const param = original_address && !partialMatch ? 'address' : 'latlng';
+	const param =
+		original_address || updated_address
+			? 'address'
+			: latitude && longitude
+			? 'latlng'
+			: null;
 
 	const location =
-		original_address && !partialMatch
-			? `${original_address} ${city ? ',' + city : ''}, GA${
-					zip ? ',' + zip : ''
-			  }`
-			: latitude && longitude
+		param === 'address' && !updated_address
+			? configureAddressStr(original_address, city, zip)
+			: param === 'latlng'
 			? `${latitude}, ${longitude}`
+			: updated_address
+			? configureAddressStr(updated_address, city, zip)
 			: null;
 
 	if (location) {
@@ -69,34 +78,81 @@ const clientHandler = async ({
 			timeout: 2000
 		});
 
-		if (
-			data.results[0].partial_match &&
-			latitude &&
-			longitude &&
-			!partialMatch
-		) {
+		const geocodedObj = { ...data.results[0] };
+
+		if (geocodedObj.partial_match && latitude && longitude && !partialMatch) {
 			partialMatch = true;
 
-			// Recursively runs function again with lat & lng (if present) to obtain geolocation of property
-			clientHandler({ name, original_address, city, zip, latitude, longitude });
+			return clientHandler({
+				name,
+				original_address,
+				city,
+				zip,
+				latitude,
+				longitude
+			});
 		}
 
-		if (data.results[0].partial_match && original_address) {
-			return handleError(
-				original_address,
-				'Geolocation error - Partial address match'
-			);
+		if (geocodedObj.partial_match) {
+			const { updatedAddressStr, error } =
+				configurePartialMatchAddress(original_address);
+
+			const partialMatchAddressErrStr = updated_address
+				? `{attempt1: ${original_address}, attempt2: ${updated_address}`
+				: original_address;
+
+			if (error)
+				return handleError(
+					partialMatchAddressErrStr,
+					`Geocoder: Address error - Returned Address: ${geocodedObj.formatted_address}`
+				);
+
+			if (
+				geocodedObj.geometry.location_type === 'APPROXIMATE' &&
+				!updated_address &&
+				!partialMatch
+			) {
+				partialMatch = true;
+
+				return clientHandler({
+					name,
+					original_address,
+					city,
+					zip,
+					longitude,
+					latitude,
+					updated_address: updatedAddressStr
+				});
+			}
+
+			if (
+				geocodedObj.geometry.location_type !== 'APPROXIMATE' &&
+				!geocodedObj.formatted_address.includes(updatedAddressStr.split(',')[0])
+			)
+				return handleError(
+					partialMatchAddressErrStr,
+					`Geocoder: Potential address error (addresses do not match) - Returned address: ${geocodedObj.formatted_address}`
+				);
+
+			if (geocodedObj.geometry.location_type === 'APPROXIMATE' && partialMatch)
+				return handleError(
+					partialMatchAddressErrStr,
+					`Geocoder: Address error (Approximate location) - Returned Address: ${geocodedObj.formatted_address}`
+				);
 		}
 
 		if (partialMatch) partialMatch = false;
 
-		return { data: data.results[0], error: false };
+		return { data: geocodedObj, error: false };
 	} else {
 		const errorAddressStr = `name: ${name ? name : 'N/A'}, address: ${
 			original_address ? original_address : 'N/A'
 		}, city: ${city ? city : 'N/A'}, zip: ${zip ? zip : 'N/A'}`;
 
-		return handleError(errorAddressStr, 'Geolocation error - Not enough info');
+		return handleError(
+			errorAddressStr,
+			'Geocoder: Address error - Not enough info'
+		);
 	}
 };
 

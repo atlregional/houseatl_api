@@ -14,13 +14,6 @@ const handleNewRecord = async ({
 	uploadId
 }) => {
 	try {
-		if (
-			Object.values(newFundingSrc).includes('LIHTC') &&
-			newSubsidy.start_date
-		) {
-			newSubsidy = handleDateLIHTC(newSubsidy, newSubsidy.start_date);
-		}
-
 		const dbSubsidy = await db.Subsidy.create({
 			...newSubsidy,
 			property_id: propertyId,
