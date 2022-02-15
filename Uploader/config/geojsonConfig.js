@@ -31,7 +31,7 @@ module.exports = {
 	},
 	CensusTracts: {
 		geoJSON: require('../../geojsons/ATL_Tracts.json'),
-		propertiesKey: 'NAME10',
+		propertiesKey: 'GEOID10',
 		modelKey: 'census_tract'
 	}
 };

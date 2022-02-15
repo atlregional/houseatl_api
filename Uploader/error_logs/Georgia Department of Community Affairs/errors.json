@@ -1,16 +1,1 @@
-{
-	"2/15/2022": [
-		{
-			"addressProvided": "1925 Glenwood Ave SE, Atlanta, GA 30316, USA",
-			"text": "Not in COA"
-		},
-		{
-			"addressProvided": "1504 Bouldercrest Rd, Atlanta, GA 30316, USA",
-			"text": "Not in COA"
-		},
-		{
-			"addressProvided": "3250 Panthersville Rd, Decatur, GA 30034, USA",
-			"text": "Not in COA"
-		}
-	]
-}
+{"2/15/2022":[{"addressProvided":"1925 Glenwood Ave SE, Atlanta, GA 30316, USA","text":"Not in COA"},{"addressProvided":"1504 Bouldercrest Rd, Atlanta, GA 30316, USA","text":"Not in COA"},{"addressProvided":"3250 Panthersville Rd, Decatur, GA 30034, USA","text":"Not in COA"},{"addressProvided":"2229 Flat Shoals Rd SE, Atlanta, GA 30316, USA","text":"Not in COA"},{"addressProvided":"2239 Flat Shoals Rd SE, Atlanta, GA 30316, USA","text":"Not in COA"},{"addressProvided":"2282 Johnson Ferry Rd NE, Atlanta, GA 30319, USA","text":"Not in COA"},{"addressProvided":"1311 E Cleveland Ave, East Point, GA 30344, USA","text":"Not in COA"},{"addressProvided":"3521 Blair Cir NE, Atlanta, GA 30319, USA","text":"Not in COA"},{"addressProvided":"4725 Walton Crossing SW, Atlanta, GA 30331, USA","text":"Not in COA"},{"addressProvided":"3522 Blair Cir NE, Atlanta, GA 30319, USA","text":"Not in COA"},{"addressProvided":"200 Vineyard Walk, Atlanta, GA 30316, USA","text":"Not in COA"},{"addressProvided":"4171 Washington Rd, Atlanta, GA 30344, USA","text":"Not in COA"},{"addressProvided":"2051 Flat Shoals Rd, Atlanta, GA 30316, USA","text":"Not in COA"},{"addressProvided":"4900 Delano Rd, Atlanta, GA 30349, USA","text":"Not in COA"},{"addressProvided":"460 East Lake Dr, Decatur, GA 30030, USA","text":"Not in COA"},{"addressProvided":"460 East Lake Dr, Decatur, GA 30030, USA","text":"Not in COA"},{"addressProvided":"2527 Skyland Dr NE, Brookhaven, GA 30319, USA","text":"Not in COA"},{"addressProvided":"9100 Cascade Palmetto Hwy, Palmetto, GA 30268, USA","text":"Not in COA"},{"addressProvided":"9100 Cascade Palmetto Hwy, Palmetto, GA 30268, USA","text":"Not in COA"}]}

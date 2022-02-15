@@ -22,6 +22,7 @@ const DeduplicatedSubsidySchema = Schema(
 		user_id: { type: Schema.Types.ObjectId, ref: 'user' },
 		subsidy_id: { type: Schema.Types.ObjectId, ref: 'subsidy' },
 		funding_sources: [],
+    uploads: [{ type: Schema.Types.ObjectId, ref: 'upload'}],
 		upload_id: { type: Schema.Types.ObjectId, ref: 'upload' },
 		created_on: { type: Date, default: Date.now() },
 		updated_on: { type: Date, default: Date.now() }

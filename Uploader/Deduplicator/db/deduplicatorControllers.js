@@ -21,6 +21,7 @@ module.exports = {
 			if (!existingSubsidy.deduplicated_subsidies[0]) {
 				updatedSubsidy = await createDedupSubAndAddToSubUpdate(updatedSubsidy, {
 					...originalSubObj,
+          subsidy_id: subsidyId,
 					funding_sources: originalSubObj.funding_sources.map(
 						({ source }) => source
 					)

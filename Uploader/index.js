@@ -14,7 +14,7 @@ const mongoURI = process.env.MONGODB_URI;
 const user = process.env.user_id;
 // const user = process.env.dev_user_id;
 
-const dropFirst = true;
+const dropFirst = process.argv[5] === 'fresh';
 
 const date = new Date();
 const todaysDate = `${

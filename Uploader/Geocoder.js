@@ -125,14 +125,14 @@ const clientHandler = async ({
 				});
 			}
 
-			if (
-				geocodedObj.geometry.location_type !== 'APPROXIMATE' &&
-				!geocodedObj.formatted_address.includes(updatedAddressStr.split(',')[0])
-			)
-				return handleError(
-					partialMatchAddressErrStr,
-					`Geocoder: Potential address error (addresses do not match) - Returned address: ${geocodedObj.formatted_address}`
-				);
+			// if (
+			// 	geocodedObj.geometry.location_type !== 'APPROXIMATE' &&
+			// 	!geocodedObj.formatted_address.includes(updatedAddressStr.split(',')[0])
+			// )
+			// 	return handleError(
+			// 		partialMatchAddressErrStr,
+			// 		`Geocoder: Potential address error (addresses do not match) - Returned address: ${geocodedObj.formatted_address}`
+			// 	);
 
 			if (geocodedObj.geometry.location_type === 'APPROXIMATE' && partialMatch)
 				return handleError(
