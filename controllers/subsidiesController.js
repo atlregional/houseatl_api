@@ -6,11 +6,11 @@ module.exports = {
 		db.Subsidy.find({})
 			.populate('funding_sources')
 			.then(data => {
-				const subsidies = !req.query.unfiltered
-					? data.filter(item => item.start_date)
-					: data;
+				// const subsidies = !req.query.unfiltered
+				// 	? data.filter(item => item.start_date)
+				// 	: data;
 
-				res.json(subsidies);
+				res.json(data);
 			})
 			.catch(err => res.status(422).json(err))
 };
