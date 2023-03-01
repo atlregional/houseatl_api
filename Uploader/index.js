@@ -14,7 +14,7 @@ const mongoURI = process.env.MONGODB_URI;
 const user = process.env.user_id;
 // const user = process.env.dev_user_id;
 
-const dropFirst = process.argv[5] === 'fresh';
+const dropFirst = false //process.argv[5] === 'fresh';
 
 const date = new Date();
 const todaysDate = `${
@@ -75,42 +75,53 @@ const init = async ({ directory, filename, sheet, user }) => {
 		}
 
 		const dataArr = data.filter(item => agencyObj.preFilter(item));
-		// ! Limiting Results for Testing -----------------------------
-		// .slice(0, 20);
-		// console.log(dataArr);
-		const { userId, agencyId, uploadId } = await initializeDbUpload(
+
+    const { userId, agencyId, uploadId } = await initializeDbUpload(
 			user,
 			agencyObj.agencyName,
 			filename,
 			dropFirst
 		);
 
+
 		console.log(`Extracting data from ${dataArr.length} records...`);
 		const errorObj = {};
 
+    // let itemCount = 0;
+
 		for await (const item of dataArr) {
-			const { Property, Subsidy, Owner, Resident, Funding_Source } =
-				createDataObj(agencyObj, item);
+			// if (itemCount === 3) {
+        const { Property, Subsidy, Owner, Resident, Funding_Source } =
+          createDataObj(agencyObj, item);
 
-			const { geocodedObj, error } = await Geocoder(Property);
+        const { geocodedObj, error } = await Geocoder(Property);
 
-			if (!error) {
-				await handleCollectionsInsert(userId, agencyId, uploadId, {
-					Owner,
-					Property: { ...Property, ...geocodedObj },
-					Subsidy,
-					Funding_Source,
-					Resident
-				});
-			} else {
-				!errorObj[todaysDate]
-					? (errorObj[todaysDate] = [geocodedObj])
-					: errorObj[todaysDate].push(geocodedObj);
-			}
+        if (!error) {
+          // console.log({ 
+          //   Property: { ...Property, ...geocodedObj } , 
+          //   Subsidy, 
+          //   Owner, 
+          //   Resident, 
+          //   Funding_Source 
+          // })
+          await handleCollectionsInsert(userId, agencyId, uploadId, {
+          	Owner,
+          	Property: { ...Property, ...geocodedObj },
+          	Subsidy,
+          	Funding_Source,
+          	Resident
+          });
+        } else {
+          !errorObj[todaysDate]
+            ? (errorObj[todaysDate] = [geocodedObj])
+            : errorObj[todaysDate].push(geocodedObj);
+        }
+      // }
+      // itemCount++
 		}
 
 		if (Object.keys(errorObj)[0]) {
-			const errorFilePath = `./Uploader/error_logs/${agencyObj.agencyName}/errors.json`;
+			const errorFilePath = `./Uploader/error_logs/${agencyObj.agencyName}/errors-dev.json`;
 			fs.writeFileSync(errorFilePath, JSON.stringify(errorObj));
 
 			console.log(`Errors Detected. See ${errorFilePath} for more info.`);

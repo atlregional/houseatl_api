@@ -1,6 +1,7 @@
 const XLSX = require('xlsx');
 const csv = require('csvtojson');
 const mappings = require('./mappings');
+const moment = require('moment');
 
 const helpers = {
 	calculateTotal(item, value) {
@@ -23,14 +24,14 @@ const helpers = {
 
 		if (type === 'month' || type === 'day') return `0${value}`;
 
-		if (type === 'year') return `20${value}`;
+		if (type === 'year') return value > 90 ? `19${value}` : `20${value}`;
 	},
 	filterByCityAndAcceptedFundingArr({
 		cityVal,
 		fundingVal,
 		acceptedFundingArr
 	}) {
-		return cityVal === 'ATLANTA' && acceptedFundingArr.includes(fundingVal);
+		return cityVal.match(/atlanta/i) && acceptedFundingArr.includes(fundingVal);
 	}
 };
 
@@ -111,8 +112,42 @@ const initialMethods = {
 				: (obj[key] = '');
 		});
 
-		if (this.agencyName === 'Atlanta Housing' && type === 'Funding_Source')
+    // CONVERVERTES AND OVERWRITERS
+
+    if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Subsidy') {
+      if (item[mapping['low_income_units']]) {
+        const lowIncomeUnits = item[mapping['low_income_units']].split(' ')[0]
+        obj['low_income_units'] = lowIncomeUnits;
+      }
+      
+      const dateValue = item[mapping['risk_of_exp']] 
+        ? this.handleDate(item[mapping['risk_of_exp']]) 
+        : null;
+
+      if (dateValue) {
+        obj['risk_of_exp'] = moment(new Date(dateValue)).subtract(1, 'day').format('M/D/YYYY');
+        obj['start_date'] = moment(new Date(dateValue)).subtract(15, 'year').format('M/D/YYYY');
+        obj['end_date'] = moment(new Date(dateValue)).add(15, 'year').subtract(1, 'day').format('M/D/YYYY')
+      } else {
+        obj['risk_of_exp'] = '';
+      }
+      
+    }
+    if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Resident') {
+      const targetPopulation = item[mapping['type_1']] 
+        ? item[mapping['type_1']].split(' ').reverse()[0] 
+        : ''
+      obj['type_1'] = targetPopulation;
+    }
+    if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Property') {
+      obj['city'] = 'Atlanta'
+    }
+    if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Funding_Source') {
+      obj['source_1'] = 'LIHTC'
+    }
+    if (this.agencyName === 'Atlanta Housing' && type === 'Funding_Source'){
 			obj['source_1'] = 'HomeFlex';
+    }
 
 		return obj;
 	}
@@ -135,10 +170,23 @@ module.exports = {
 	DCA: {
 		...initialMethods,
 		agencyName: 'Georgia Department of Community Affairs',
-		cityKey: 'City',
-		fundingSrcNameKey: 'Primary Funding Source',
-		acceptedFundingSrc: ['LIHTC'],
-		xlsxRange: 2,
+		cityKey: 'Project City',
+		fundingSrcNameKey: 'Project Funding Source',
+		acceptedFundingSrc: [
+      // FOR LIHTC
+      'LIHTC', 
+      'LIHTC & HUD HOME', 
+      'LIHTC & Tax Credit Assistance Program',
+      'LIHTC & Exchange (1602)'
+      // FOR HUD HOME
+      // 'LIHTC & HUD HOME', 
+      // 'HUD HOME',
+      // 'HUD HOME, Housing Trust Fund, Tax Credit Assistance Program',
+      // 'Tax Credit Assistance Program & HUD HOME',
+      // 'HUD HOME & Tax Credit Assistance Program'
+
+    ],
+		xlsxRange: 0,
 		preFilter(obj) {
 			if (obj[this.fundingSrcNameKey] && obj[this.cityKey])
 				return helpers.filterByCityAndAcceptedFundingArr({
@@ -147,7 +195,7 @@ module.exports = {
 					acceptedFundingArr: this.acceptedFundingSrc
 				});
 			else if (obj[this.cityKey])
-				return obj[this.cityKey].toUpperCase() === 'ATLANTA';
+				return obj[this.cityKey].match(/atlanta/i);
 
 			return false;
 		}

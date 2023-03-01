@@ -3,6 +3,7 @@ module.exports = {
 		{ key: 'development_type', type: 'str' },
 		{ key: 'start_date', type: 'str' },
 		{ key: 'end_date', type: 'str' },
+    { key: 'risk_of_exp', type: 'str'},
 		{ key: 'ami_30', type: 'int' },
 		{ key: 'ami_50', type: 'int' },
 		{ key: 'ami_60', type: 'int' },
@@ -24,7 +25,7 @@ module.exports = {
 		'ami_120',
 		'low_income_units'
 	],
-	dateKeys: ['start_date', 'end_date'],
+	dateKeys: ['start_date', 'end_date','risk_of_exp'],
 	agencyHierarchy: [
 		'City of Atlanta',
 		'Invest Atlanta',

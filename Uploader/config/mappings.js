@@ -75,22 +75,22 @@ module.exports = {
 	},
 	'Georgia Department of Community Affairs': {
 		Property: {
-			name: 'Property Name',
-			original_address: 'Address',
-			city: 'City',
-			zip: 'Zip Code',
-			county: 'County',
+			name: 'Project Name',
+			original_address: 'Project Address 1',
+			city: 'Project City',
+			zip: 'Project Zip Code',
+			county: 'Project County',
 			total_units: 'Total Units'
 		},
 		Owner: {
-			name: 'Owner Main Contact (Warm Body)'
+			name: 'Owner'
 		},
 		Subsidy: {
-			project_name: 'Property Name',
-			development_type: 'New Construction or Acq./Rehab',
-			start_date: 'First PIS',
-			end_date: 'End of Extended Use Period',
-			risk_of_exp: 'End of Compliance Period w/o LURC yrs added',
+			project_name: 'Project Name',
+			development_type: 'Project Type',
+			start_date: '', // 'Affordability Start Date' for HUD HOME , 
+			end_date:  '', // 'Affordability End Date' for HUD HOME,
+			risk_of_exp: 'Extended Period Start Date', // CONVERTER ADDED TO SUBTRACT BY ONE DAY
 			ami_30: '',
 			ami_50: '',
 			ami_60: '',
@@ -98,15 +98,15 @@ module.exports = {
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: 'No. LIHTC Units'
+			low_income_units: 'Targeted Population' // CONVERTER ADDED TO TAKE FIRST STRING VALUE
 		},
 		Resident: {
-			type_1: 'Tenancy',
+			type_1: 'Targeted Population', // CONVERTER ADDED TO TAKE LAST STRING VALUE
 			type_2: ''
 		},
 		// Only take LIHTC from DCA
 		Funding_Source: {
-			source_1: 'Primary Funding Source',
+			source_1: 'Project Funding Source', // USE LINES 130 AND 157 OF agencyConfig TO SET 
 			source_2: ''
 			// source_2: 'Secondary Funding Source'
 		}
@@ -202,7 +202,7 @@ module.exports = {
 		},
 		Funding_Source: {
 			// No funding source data provided...
-			source_1: '',
+			source_1: 'FUNDING SOURCE',
 			source_2: ''
 		}
 	},

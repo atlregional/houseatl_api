@@ -6,6 +6,7 @@ const {
 const { getTime, createFundingArrays, isExactMatch } = require('./utils');
 const configArrays = require('../config/configArrays');
 const consolidateSubsidies = require('./Consolidator');
+const e = require('express');
 // const { config } = require('dotenv');
 
 const updateSubsidy = async props => {
@@ -58,6 +59,13 @@ const updateSubsidy = async props => {
 			console.log('Duplicate: update null');
 			configObj.type = 'update_null';
 		} else if (
+		// 	existingFundingArr.includes('LIHTC') &&
+		// 	newFundingArr.includes('LIHTC') &&
+		// 	agencyId.toString() === existingAgencyId.toString()
+    // ) {
+		// 	console.log('Duplicate: update null');
+		// 	configObj.type = 'update_null';
+    // } else if (
 			existingFundingArr.includes('HOME') &&
 			newFundingArr.includes('HOME')
 		) {
@@ -128,11 +136,23 @@ const evaluateSubsidies = ({
 		getTime(existingSubsidy.start_date) === getTime(newSubsidy.start_date) ||
 		getTime(existingSubsidy.end_date) === getTime(newSubsidy.end_date) ||
 		getTime(newSubsidy.start_date) > getTime(existingSubsidy.start_date) ||
-		getTime(newSubsidy.end_date) > getTime(existingSubsidy.end_date)
+		getTime(newSubsidy.end_date) > getTime(existingSubsidy.end_date) ||
+    getTime(newSubsidy.risk_of_exp) === getTime(existingSubsidy.risk_of_exp)
+
 	) {
 		console.log('Update: dates');
 		return { action: 'update' };
-	} else {
+	} 
+  // else if (
+  //     newFundingArr.includes('LIHTC') && 
+  //     existingFundingArr.includes('LIHTC') &&
+  //     getTime(newSubsidy.risk_of_exp) === getTime(existingSubsidy.risk_of_exp)
+  // ) {
+  //   console.log('Update: LIHTC same risk date')
+  //   return {action: 'update'}
+
+  // } 
+  else {
 		console.log('Reject: no case met');
 		return { action: 'reject' };
 	}
@@ -145,27 +165,31 @@ const deduplicateSubsidies = async props => {
 		if (existingSubId) {
 			const existingSubsidy = await getSubsidy(existingSubId);
 
-			const existingAgencyId =
-				existingSubsidy.uploads[existingSubsidy.uploads.length - 1].agency_id;
 
-			const { action } = existingSubsidy
-				? evaluateSubsidies({
-						existingSubsidy,
-						newSubsidy,
-						newFundingSrc,
-						agencyId,
-						existingAgencyId
-				  })
-				: { action: 'insert' };
 
-			if (action === 'update') {
-				props.existingSubsidy = existingSubsidy;
-				props.existingAgencyId = existingAgencyId;
+        const existingAgencyId = existingSubsidy
+          ? existingSubsidy.uploads[existingSubsidy.uploads.length - 1].agency_id
+          : null;
 
-				const updateObj = await updateSubsidy(props);
+        const { action } = existingSubsidy
+          ? evaluateSubsidies({
+              existingSubsidy,
+              newSubsidy,
+              newFundingSrc,
+              agencyId,
+              existingAgencyId
+            })
+          : { action: 'insert' };
 
-				return updateObj;
-			}
+        if (action === 'update') {
+          props.existingSubsidy = existingSubsidy;
+          props.existingAgencyId = existingAgencyId;
+
+          const updateObj = await updateSubsidy(props);
+
+          return updateObj;
+        }
+
 
 			return action === 'reject'
 				? { update: true, type: action, existingAgencyId }
