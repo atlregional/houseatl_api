@@ -1,0 +1,42 @@
+[
+  {
+    "id": "621d2f0a204fad79e97053d7",
+    "longitude": -84.37790199999999,
+    "latitude": 33.7050543,
+    "address": "1800 Jonesboro Rd SE, Atlanta, GA 30315, USA",
+    "totalUnits": 9,
+    "ownerName": "n/a",
+    "totalSubsidizedUnits": 9,
+    "subsidies": [
+      {
+        "SubStart": "n/a",
+        "SubEnd": "n/a",
+        "Funding": [
+          "HOB"
+        ],
+        "RiskUnits": "",
+        "ExtendedUseStatus": "n/a",
+        "Stewarding": "n/a",
+        "UnitsSub": 9,
+        "tenantType": "Homeowner",
+        "ami_30": "",
+        "ami_50": "",
+        "ami_60": "",
+        "ami_80": "",
+        "ami_100": "",
+        "ami_115": "",
+        "ami_120": "9",
+        "housingType": "Preservation/Rehab",
+        "project_name": "Lakewood Homeownership Initiative",
+        "updated_on": "2022-02-28T20:22:27.810Z",
+        "riskOfExp": "n/a",
+        "subsidyPercentSub": 100
+      }
+    ],
+    "totalPercentSubsidized": 100,
+    "census_tract": "13121007002",
+    "neighborhood_statistical_area": "Y04",
+    "neighborhood_planning_unit": "Y",
+    "city_council_district": "1"
+  }
+]
