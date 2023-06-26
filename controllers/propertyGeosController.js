@@ -5,6 +5,7 @@ const {
   getStewardingAgency,
   calRisk
 } = require('./propertyGeosControllerUtils');
+const util = require('util');
 
 module.exports = {
   findAll: async (req, res) => {
@@ -143,7 +144,7 @@ module.exports = {
                     },
                     UnitsSub: { $ifNull: ['$$subsidy.low_income_units', 0] },
                     housingType: { $ifNull: ['$$subsidy.development_type', 'n/a'] },
-                    funding_sources: {
+                    Funding: {
                       $cond: {
                         if: { $lt: [{ $size: '$$subsidy.funding_sources' }, 1] },
                         then: ['n/a'],
@@ -245,7 +246,7 @@ module.exports = {
                       $function: {
                         body: getStewardingAgency.toString(),
                         args: [
-                          '$$subsidy.funding_sources',
+                          '$$subsidy.Funding',
                           '$$subsidy.uploads',
                           '$properties.agencies'
                         ],
@@ -282,7 +283,28 @@ module.exports = {
         addFieldsToProperties,
         updateStewarding,
         projectResult
-      ]);
+      ], {
+        allowDiskUse: true
+      });
+
+      const explain = await Geo.aggregate([
+        lookupProperties,
+        unwindProperties,
+        lookupOwners,
+        lookupSubsidies,
+        lookupFundingSources,
+        lookupResidents,
+        lookupAgencies,
+        addFieldsToProperties,
+        updateStewarding,
+        projectResult
+      ], {
+        allowDiskUse: true,
+        explain: true
+      }).explain();
+
+      console.log(util.inspect(explain,false,null,true ))
+      // console.log(explain);
 
       geoJSON.features = populatedPropertyGeos;
       res.status(200).json(geoJSON);

@@ -34,7 +34,11 @@ mongoose
 		useNewUrlParser: true,
 		useUnifiedTopology: true
 	})
-  // .then(res => console.log(res.connections[0]))
+  .then(res =>  console.log(
+    res.connections?.[0] ? 
+    `Connected to ${mongoURI}...` :
+    `Could NOT connect to ${mongoURI}.`
+  ))
 	.catch(err => console.log(err));
 
 app.listen(PORT, () => {
