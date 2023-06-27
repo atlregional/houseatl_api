@@ -1,4 +1,63 @@
-const moment = require('moment/moment');
+function handleFundingArray() {
+  return {
+    $cond: {
+      if: { $lt: [{ $size: '$$subsidy.funding_sources' }, 1] },
+      then: ['n/a'],
+      else: {
+        $map: {
+          input: '$$subsidy.funding_sources',
+          as: 'fundingSource',
+          in: {
+            $let: {
+              vars: {
+                fundingSourceObj: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: '$properties.fundingSources',
+                        as: 'fs',
+                        cond: { $eq: ['$$fs._id', '$$fundingSource'] }
+                      }
+                    },
+                    0
+                  ]
+                }
+              },
+              in: '$$fundingSourceObj.source'
+            }
+          }
+        }
+      }
+    }
+  };
+}
+
+function handleTotalSubsidizedUnits() {
+  return {
+    $let: {
+      vars: {
+        maxSubsidy: {
+          $arrayElemAt: [
+            {
+              $filter: {
+                input: '$properties.subsidies',
+                as: 'subsidy',
+                cond: {
+                  $eq: [
+                    '$$subsidy.low_income_units',
+                    { $max: '$properties.subsidies.low_income_units' }
+                  ]
+                }
+              }
+            },
+            0
+          ]
+        }
+      },
+      in: { $ifNull: ['$$maxSubsidy.low_income_units', 0] }
+    }
+  };
+}
 
 function getStewardingAgency(fundingArray, uploads, agencyInfo) {
   const agenciesStewardingHOME = ['Georgia Department of Community Affairs', 'City of Atlanta'];
@@ -6,48 +65,50 @@ function getStewardingAgency(fundingArray, uploads, agencyInfo) {
   const strArray = [];
   const fundingSource = fundingArray[0] || null;
 
-  if (
-    agencyInfo
-      .filter(obj => obj.uploads.includes(uploads[0]))
-      .map(obj => obj.name)
-      .includes('Invest Atlanta')
-  ) {
-    strArray.push('Invest Atlanta');
-  }
-  if (fundingSource.includes('LIHTC')) {
-    strArray.push('Georgia Department of Community Affairs');
-  }
-  if (fundingSource.includes('HomeFlex')) {
-    strArray.push('Atlanta Housing');
-  }
-  if (fundingSource.includes('HOME')) {
-    const upload = uploads[0];
-    let agencyName = 'n/a';
-    agencyInfo.forEach(obj =>
-      obj.uploads.forEach(uploadID => {
-        if (upload === uploadID) agencyName = obj.name;
-      })
-    );
-
-    strArray.push(agenciesStewardingHOME.includes(agencyName) ? agencyName : 'n/a');
-  }
-  if (fundingSource.includes('Section 202') || fundingSource.includes('Section 8')) {
-    strArray.push('Housing and Urban Development');
-  }
-  if (fundingSource.includes('Public Housing') || fundingSource.includes('AH Subsidy')) {
-    strArray.push('Atlanta Housing');
-  }
-
-  if (strArray[0]) {
-    if (strArray.length === 1) {
-      return strArray[0];
+  if (fundingSource) {
+    if (
+      agencyInfo
+        .filter(obj => obj.uploads.includes(uploads[0]))
+        .map(obj => obj.name)
+        .includes('Invest Atlanta')
+    ) {
+      strArray.push('Invest Atlanta');
     }
-    if (strArray.length >= 2) {
-      return strArray.join(', ');
+    if (fundingSource.includes('LIHTC')) {
+      strArray.push('Georgia Department of Community Affairs');
     }
-    // if (strArray.length > 2) {
-    //   return `${strArray.filter((str, i) => i < strArray.length - 1).join(', ')} & ${strArray[strArray.length -1]}`
-    // }
+    if (fundingSource.includes('HomeFlex')) {
+      strArray.push('Atlanta Housing');
+    }
+    if (fundingSource.includes('HOME')) {
+      const upload = uploads[0];
+      let agencyName = 'n/a';
+      agencyInfo.forEach(obj =>
+        obj.uploads.forEach(uploadID => {
+          if (upload === uploadID) agencyName = obj.name;
+        })
+      );
+
+      strArray.push(agenciesStewardingHOME.includes(agencyName) ? agencyName : 'n/a');
+    }
+    if (fundingSource.includes('Section 202') || fundingSource.includes('Section 8')) {
+      strArray.push('Housing and Urban Development');
+    }
+    if (fundingSource.includes('Public Housing') || fundingSource.includes('AH Subsidy')) {
+      strArray.push('Atlanta Housing');
+    }
+
+    if (strArray[0]) {
+      if (strArray.length === 1) {
+        return strArray[0];
+      }
+      if (strArray.length >= 2) {
+        return strArray.join(', ');
+      }
+      // if (strArray.length > 2) {
+      //   return `${strArray.filter((str, i) => i < strArray.length - 1).join(', ')} & ${strArray[strArray.length -1]}`
+      // }
+    }
   }
 
   return 'n/a';
@@ -145,4 +206,11 @@ function formatDateInMongoAggregation(dateField) {
   };
 }
 
-module.exports = { formatAsProperName, formatDateInMongoAggregation, getStewardingAgency, calRisk };
+module.exports = {
+  formatAsProperName,
+  formatDateInMongoAggregation,
+  getStewardingAgency,
+  calRisk,
+  handleFundingArray,
+  handleTotalSubsidizedUnits
+};

@@ -1,9 +1,12 @@
+const { filter } = require('compression');
 const { Geo } = require('../models');
 const {
   formatAsProperName,
   formatDateInMongoAggregation,
   getStewardingAgency,
-  calRisk
+  calRisk,
+  handleFundingArray,
+  handleTotalSubsidizedUnits
 } = require('./propertyGeosControllerUtils');
 const util = require('util');
 
@@ -80,30 +83,7 @@ module.exports = {
           },
           'properties.tax_allocation_district': { $literal: '' },
           'properties.totalUnits': { $ifNull: ['$properties.total_units', 'n/a'] },
-          'properties.totalSubsidizedUnits': {
-            $let: {
-              vars: {
-                maxSubsidy: {
-                  $arrayElemAt: [
-                    {
-                      $filter: {
-                        input: '$properties.subsidies',
-                        as: 'subsidy',
-                        cond: {
-                          $eq: [
-                            '$$subsidy.low_income_units',
-                            { $max: '$properties.subsidies.low_income_units' }
-                          ]
-                        }
-                      }
-                    },
-                    0
-                  ]
-                }
-              },
-              in: { $ifNull: ['$$maxSubsidy.low_income_units', 0] }
-            }
-          },
+          'properties.totalSubsidizedUnits': handleTotalSubsidizedUnits(),
           // Add fields to each subsidy in properties.subsidies
           'properties.subsidies': {
             $map: {
@@ -144,35 +124,12 @@ module.exports = {
                     },
                     UnitsSub: { $ifNull: ['$$subsidy.low_income_units', 0] },
                     housingType: { $ifNull: ['$$subsidy.development_type', 'n/a'] },
-                    Funding: {
-                      $cond: {
-                        if: { $lt: [{ $size: '$$subsidy.funding_sources' }, 1] },
-                        then: ['n/a'],
-                        else: {
-                          $map: {
-                            input: '$$subsidy.funding_sources',
-                            as: 'fundingSource',
-                            in: {
-                              $let: {
-                                vars: {
-                                  fundingSourceObj: {
-                                    $arrayElemAt: [
-                                      {
-                                        $filter: {
-                                          input: '$properties.fundingSources',
-                                          as: 'fs',
-                                          cond: { $eq: ['$$fs._id', '$$fundingSource'] }
-                                        }
-                                      },
-                                      0
-                                    ]
-                                  }
-                                },
-                                in: '$$fundingSourceObj.source'
-                              }
-                            }
-                          }
-                        }
+                    Funding: handleFundingArray(),
+                    Stewarding: {
+                      $function: {
+                        body: getStewardingAgency.toString(),
+                        args: [handleFundingArray(), '$$subsidy.uploads', '$properties.agencies'],
+                        lang: 'js'
                       }
                     },
                     tenantType: {
@@ -231,35 +188,12 @@ module.exports = {
         }
       };
 
-      // Happens outside of the above $addFields due to needing funding_sources to be updated before calling the getStewardingAgency function
-      const updateStewarding = {
-        $addFields: {
-          'properties.subsidies': {
-            $map: {
-              input: '$properties.subsidies',
-              as: 'subsidy',
-              in: {
-                $mergeObjects: [
-                  '$$subsidy',
-                  {
-                    Stewarding: {
-                      $function: {
-                        body: getStewardingAgency.toString(),
-                        args: [
-                          '$$subsidy.Funding',
-                          '$$subsidy.uploads',
-                          '$properties.agencies'
-                        ],
-                        lang: 'js'
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      };
+      // const filter = {
+      //   $match: {
+      //     // 'properties.subsidies': { $exists: true, $not: { $size: 0 } },
+      //     'properties.totalSubsidizedUnits': { $exists: true, $gt: 0 }
+      //   }
+      // };
 
       const projectResult = {
         $project: {
@@ -272,41 +206,60 @@ module.exports = {
         }
       };
 
-      const populatedPropertyGeos = await Geo.aggregate([
-        lookupProperties,
-        unwindProperties,
-        lookupOwners,
-        lookupSubsidies,
-        lookupFundingSources,
-        lookupResidents,
-        lookupAgencies,
-        addFieldsToProperties,
-        updateStewarding,
-        projectResult
-      ], {
-        allowDiskUse: true
-      });
+      const populatedPropertyGeos = await Geo.aggregate(
+        [
+          lookupProperties,
+          unwindProperties,
+          lookupOwners,
+          lookupSubsidies,
+          lookupFundingSources,
+          lookupResidents,
+          lookupAgencies,
+          addFieldsToProperties,
+          // filter,
+          projectResult
+        ],
+        {
+          allowDiskUse: true
+        }
+      );
 
-      const explain = await Geo.aggregate([
-        lookupProperties,
-        unwindProperties,
-        lookupOwners,
-        lookupSubsidies,
-        lookupFundingSources,
-        lookupResidents,
-        lookupAgencies,
-        addFieldsToProperties,
-        updateStewarding,
-        projectResult
-      ], {
-        allowDiskUse: true,
-        explain: true
-      }).explain();
+      // populatedPropertyGeos.map(obj => {
+      //   const test = 'test';
+      //   obj.test = test;
+      //   obj.properties.test = 'test';
+      // });
 
-      console.log(util.inspect(explain,false,null,true ))
+      // .filter(obj => obj.properties.totalSubsidizedUnits > 0);
+      // console.log(populatedPropertyGeos.length);
+
+      // const explain = await Geo.aggregate(
+      //   [
+      //     lookupProperties,
+      //     unwindProperties,
+      //     lookupOwners,
+      //     lookupSubsidies,
+      //     lookupFundingSources,
+      //     lookupResidents,
+      //     lookupAgencies,
+      //     addFieldsToProperties,
+      //     // updateStewarding,
+      //     projectResult
+      //   ],
+      //   {
+      //     allowDiskUse: true,
+      //     explain: true
+      //   }
+      // ).explain();
+
+      // console.log(util.inspect(explain, false, null, true));
+
       // console.log(explain);
 
       geoJSON.features = populatedPropertyGeos;
+      // geoJSON.features = populatedPropertyGeos.filter(
+      //   obj => obj.properties.totalSubsidizedUnits > 0
+      // );
       res.status(200).json(geoJSON);
     } catch (err) {
       console.error(err);
