@@ -4,7 +4,7 @@ const findAll = async (req, res) => {
   try {
     const [properties, subsidies, residents, agencies, uploads, owners] = await Promise.all([
       getAllDataFromModel(Property),
-      getAllDataFromModel(Subsidy),
+      getAllDataFromModel(Subsidy, 'funding_sources'),
       getAllDataFromModel(Resident),
       getAllDataFromModel(Agency),
       getAllDataFromModel(Upload),
@@ -26,14 +26,22 @@ const findAll = async (req, res) => {
   }
 };
 
-function getAllDataFromModel(model) {
+function getAllDataFromModel(model, populate) {
   return new Promise((resolve, reject) => {
-    model
+    !populate 
+    ? model
       .find({})
       .then(result => {
         resolve(result);
       })
-      .catch(err => reject(err));
+      .catch(err => reject(err))
+    : model
+    .find({})
+    .populate(populate)
+    .then(result => {
+      resolve(result);
+    })
+    .catch(err => reject(err));
   });
 }
 
