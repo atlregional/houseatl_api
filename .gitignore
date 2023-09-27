@@ -111,3 +111,6 @@ data/*
 .prettierignore
 .vscode
 .DS_Store
+
+# Dev reports
+reports/
