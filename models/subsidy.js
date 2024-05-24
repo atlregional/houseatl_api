@@ -4,8 +4,8 @@ const SubsidySchema = Schema(
 	{
 		project_name: { type: String },
 		development_type: { type: String },
-		start_date: { type: String },
-		end_date: { type: String },
+		start_date: { type: Date },
+		end_date: { type: Date },
 		risk_of_exp: { type: String },
 		year_15: { type: String },
 		year_30: { type: String },
