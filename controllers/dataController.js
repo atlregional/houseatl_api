@@ -74,6 +74,13 @@ const find = async (req, res) => {
     result.stats = await getSubsidyStats(subsidyFilter) 
 
 
+
+
+    if (justStats) {
+      console.log('Just Stats Requested');
+      return res.json(result);
+    }
+
     if (justIDs) {
       console.log('Just IDs Requested');
       // console.log(subsidyFilter);
@@ -85,11 +92,7 @@ const find = async (req, res) => {
       const propertyIDs = new Set();
       subsidies.forEach(({property_id}) => propertyIDs.add(property_id.toString()))
       result.propertyIDs = [...propertyIDs];
-      // console.log(result.propertyIDs.length);
-    }
 
-    if (justStats) {
-      console.log('Just Stats Requested');
       return res.json(result);
     }
 
