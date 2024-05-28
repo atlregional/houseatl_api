@@ -39,6 +39,7 @@ const find = async (req, res) => {
     const {
       // propertyFilter, // property level filter
       // includeArray, // array of property IDs
+      id,
       justStats, // just get the stats using the filter and include array
       justIDs, // return an array of property IDs 
       pagination,  // return property data in paginated chunks
@@ -51,14 +52,22 @@ const find = async (req, res) => {
       subsidyFilter, // subsidy level filter w/ {property_id: { $in: includeArray}}
     } = req.body;
 
-
     console.log('Request Params', req.query);
     console.log('Request Body', req.body )
     
     const result = {};
 
-    // const propertyFilterObject = propertyFilter || {};
-    // const subsidyFilterObject = subsidyFilter || {};
+
+    if (id) {
+      console.log('Get all data for single property', id);
+      result.property = await getDataFromModel({
+        id,
+        model: Property,
+        populate: 'subsidies'
+      })
+      return res.json(result);
+    }
+
 
     if (subsidyFilter?.start_date)  {
       subsidyFilter.start_date = {$gte: new Date(subsidyFilter.start_date)}    
@@ -68,13 +77,8 @@ const find = async (req, res) => {
       subsidyFilter.end_date = {$lte: new Date(subsidyFilter.end_date)}    
     }
 
-    // console.log('Requested Subsidy Filter', subsidyFilter);
-
     console.log('Getting Stats');
     result.stats = await getSubsidyStats(subsidyFilter) 
-
-
-
 
     if (justStats) {
       console.log('Just Stats Requested');
@@ -96,8 +100,6 @@ const find = async (req, res) => {
       return res.json(result);
     }
 
-
-
     if (pagination) {
       console.log('Paginated Data Requested for Page', pagination)
     }
@@ -118,7 +120,6 @@ const find = async (req, res) => {
     // ELSE JUST SEND BARE GEO PROPERTY GEOMETRIES
     result.properties = await getDataFromModel({
       model: Property,
-      // populate: 'subsidies',
       select: 'id, geometry'
     });
 
@@ -148,10 +149,12 @@ function getAllDataFromModel(model, populate) {
   });
 };
 
-function getDataFromModel({ model, populate, filter, select }) {
+function getDataFromModel({ id, model, filter, populate, select }) {
   return new Promise((resolve, reject) => {
     
-    const query = model.find(filter || {}).select(select);
+    const query = id 
+      ? model.findById(id).select(select) 
+      : model.find(filter || {}).select(select);
     
     if (populate) {
       query.populate(populate);
@@ -165,7 +168,7 @@ function getDataFromModel({ model, populate, filter, select }) {
         reject(err);
       });
   });
-}
+};
 
 async function getSubsidyStats(subsidyFilter) {
 
@@ -231,6 +234,6 @@ async function getSubsidyStats(subsidyFilter) {
 
   const stats = await Subsidy.aggregate(agg).exec();
   return stats[0]
-}
+};
 
 module.exports = { findAll, find };
