@@ -8,7 +8,8 @@ const propertyRoutes = require('./properties'),
   uploadRoutes = require('./uploads'),
   ownerRoutes = require('./owners'),
   propertyGeoRoutes = require('./propertyGeo'),
-  dataRoutes = require('./data');
+  dataRoutes = require('./data'),
+  geoRoutes = require('./geos');
 
 router.use('/rest/properties', propertyRoutes);
 router.use('/rest/subsidies', subsidyRoutes);
@@ -18,6 +19,7 @@ router.use('/rest/uploads', uploadRoutes);
 router.use('/rest/owners', ownerRoutes);
 router.use('/rest/propertygeos', propertyGeoRoutes);
 router.use('/rest/data', dataRoutes);
+router.use('/rest/geos',geoRoutes)
 
 router.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;

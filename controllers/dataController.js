@@ -52,7 +52,7 @@ const find = async (req, res) => {
       subsidyFilter, // subsidy level filter w/ {property_id: { $in: includeArray}}
     } = req.body;
 
-    console.log('Request Params', req.query);
+    console.log('\n***\nRequest Params', req.query);
     console.log('Request Body', req.body )
     
     const result = {};
