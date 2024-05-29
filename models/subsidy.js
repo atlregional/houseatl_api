@@ -4,6 +4,7 @@ const SubsidySchema = Schema(
 	{
 		project_name: { type: String },
 		development_type: { type: String },
+    funding_sources: { type: String },
 		start_date: { type: Date },
 		end_date: { type: Date },
 		risk_of_exp: { type: String },
@@ -19,9 +20,10 @@ const SubsidySchema = Schema(
 		ami_115: { type: String },
 		ami_120: { type: String },
 		low_income_units: { type: Number },
+    target_population: {type: String},
 		property_id: { type: Schema.Types.ObjectId, ref: 'property' },
 		user_id: { type: Schema.Types.ObjectId, ref: 'user' },
-		funding_sources: [{ type: Schema.Types.ObjectId, ref: 'fundingSource' }],
+		// funding_sources: [{ type: Schema.Types.ObjectId, ref: 'fundingSource' }],
 		deduplicated_subsidies: [
 			{ type: Schema.Types.ObjectId, ref: 'deduplicatedSubsidy' }
 		],

@@ -1,10 +1,21 @@
 const { Property, Subsidy, Resident, Agency, Upload, Owner } = require('../models');
-const {
-  calculateStats,
-  handleSnapshotData,
-  downloadCSV
-} = require('./propertiesController.utils');
-const util = require('util')
+const { Parser } = require('json2csv');
+const ExcelJS = require('exceljs');
+// const {
+//   calculateStats,
+//   handleSnapshotData,
+//   downloadCSV
+// } = require('./propertiesController.utils');
+const util = require('util');
+
+const getModel = { 
+  property: Property,
+  subsidy: Subsidy,
+  resident: Resident,
+  agency: Agency,
+  upload: Upload,
+  owner: Owner 
+}
 
 const findAll = async (req, res) => {
   try {
@@ -44,19 +55,31 @@ const find = async (req, res) => {
       justIDs, // return an array of property IDs 
       pagination,  // return property data in paginated chunks
       populated, // for finding a single property and all its info
-      downloadCSV, // return csv
-      snapshotData // return data formatted for snapshots
+      snapshotData, // return data formatted for snapshots
+      downloadCSV,
+      downloadXLSX
     } = req.query;
 
     const {
       subsidyFilter, // subsidy level filter w/ {property_id: { $in: includeArray}}
+      download, // return csv { fileType: 'csv' or 'xlsx', model: 'properties' or 'subsidies', populated: ''}
     } = req.body;
 
-    console.log('\n***\nRequest Params', req.query);
-    console.log('Request Body', req.body )
-    
     const result = {};
+    const currentTime = new Date().toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      timeZone: 'America/New_York'
+    }).replace(/[\/,:\s]/g, '-');
 
+    console.log(currentTime);
+
+
+    console.log('\n***\nRequest Params', req.query);
+    console.log('Request Body', req.body );
 
     if (id) {
       console.log('Get all data for single property', id);
@@ -75,6 +98,152 @@ const find = async (req, res) => {
 
     if (subsidyFilter?.end_date)  {
       subsidyFilter.end_date = {$lte: new Date(subsidyFilter.end_date)}    
+    }
+
+    const stringMatchFields = [
+      'target_population',
+      'funding_sources'
+    ]
+
+    stringMatchFields.forEach(field => {
+      if (subsidyFilter?.[field])  {
+        subsidyFilter[field] = new RegExp(subsidyFilter[field], 'i')   
+      }      
+    })
+    
+    if (download || downloadCSV || downloadXLSX) {
+      console.log('CSV Download Requested');
+      const data = await getDataFromModel({
+        filter: subsidyFilter || {},
+        model: Subsidy, //getModel[download.model] || Subsidy,
+        populate: 'property_id'// download.populate || null
+      });
+
+      const columns = [
+        // { "header":"Id",
+        //   "key": ""
+        // },
+        { 
+          "header":"Project Name",
+          "key": "project_name"
+        },
+        { 
+          "header":"Address",
+          "key": "property_id.address"
+        },
+        { 
+          "header":"Longitude",
+          "key": "property_id.longitude"
+        },
+        { 
+          "header":"Latitude",
+          "key": "property_id.latitude"
+        },
+        { 
+          "header":"Total Units",
+          "key": "property_id.total_units"
+        },
+        { 
+          "header":"Project Subsidy Units",
+          "key": "low_income_units"
+        },
+        { 
+          "header":"Development Type",
+          "key": "development_type"
+        },
+        { 
+          "header":"Subsidy Start Date",
+          "key": "start_date"
+        },
+        { 
+          "header":"Subsidy End Date",
+          "key": "end_date"
+        },
+        { 
+          "header":"Subsidy Early End Date (LIHTC only)",
+          "key": "risk_of_exp"
+        },
+        { 
+          "header":"Funding Source",
+          "key": "funding_sources"
+        },
+        // { 
+        //   "header":"Duration Until Expiration",
+        //   "key": ""
+        // },
+        // { 
+        //   "header":"Extended Use Status (LIHTC only)",
+        //   "key": ""
+        // },
+        { 
+          "header":"Stewarding Agency",
+          "key": ""
+        },
+        { 
+          "header":"Target Population",
+          "key": "target_population"
+        },
+        { 
+          "header":"AMI 30",
+          "key": "ami_30"
+        },
+        { 
+          "header":"AMI 50",
+          "key": "ami_50"
+        },
+        { 
+          "header":"AMI 60",
+          "key": "ami_60"
+        },
+        { 
+          "header":"AMI 80",
+          "key": "ami_80"
+        },
+        { 
+          "header":"AMI 100",
+          "key": "ami_100"
+        },
+        { 
+          "header":"AMI 115",
+          "key": "ami_115"
+        },
+        { 
+          "header":"AMI 120",
+          "key": "ami_120"
+        },
+        { 
+          "header":"Census Tract",
+          "key": "property_id.census_tract"
+        },
+        { 
+          "header":"Council District",
+          "key": "property_id.city_council_district"
+        },
+        { 
+          "header":"Neighborhood Statistical Area",
+          "key": "property_id.neighborhood_statistical_area"
+        },
+        { 
+          "header":"NPU",
+          "key": "property_id.neighborhood_planning_unit"
+        },
+        { 
+          "header":"TAD",
+          "key": "property_id.tax_allocation_district"
+        }
+      ];
+
+      if (download?.type === 'csv' || downloadCSV ) {
+        const csvData = generateCSV(data, columns);
+        res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download-${currentTime}.csv`);
+        res.setHeader('Content-Type', 'text/csv');
+        res.send(csvData);
+      } else if (download?.type === 'xlsx' || downloadXLSX) {
+        await generateXLSX(data, columns, res, currentTime);
+      } else {
+        res.status(400).send('Unsupported download type');
+      }
+      return;
     }
 
     console.log('Getting Stats');
@@ -108,10 +277,6 @@ const find = async (req, res) => {
       console.log('Populated Property Data Requested')
     }
 
-    if (downloadCSV) {
-      console.log('CSV Download Requested')
-    }
-
     if (snapshotData) {
       console.log('Snapshot Data Requested')
 
@@ -128,6 +293,33 @@ const find = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+function generateCSV(data, columns) {
+  const opts = { fields: columns.map(col => ({ label: col.header, value: col.key })) };
+  const parser = new Parser(opts);
+  return parser.parse(data);
+};
+
+async function generateXLSX(data, columns, res, currentTime) {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Data');
+
+  worksheet.columns = columns.map(col => ({ header: col.header, key: col.key }));
+
+  data.forEach(item => {
+    const row = {};
+    columns.forEach(col => {
+      row[col.key] = col.key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
+    });
+    worksheet.addRow(row);
+  });
+
+  res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download-${currentTime}.xlsx`);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+  await workbook.xlsx.write(res);
+  res.end();
 };
 
 function getAllDataFromModel(model, populate) {
@@ -157,7 +349,12 @@ function getDataFromModel({ id, model, filter, populate, select }) {
       : model.find(filter || {}).select(select);
     
     if (populate) {
-      query.populate(populate);
+      if (Array.isArray(populate)) {
+        populate.forEach(pop =>
+        query.populate(pop))
+      } else {
+        query.populate(populate);
+      }
     }
     
     query
