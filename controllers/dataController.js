@@ -66,16 +66,7 @@ const find = async (req, res) => {
     } = req.body;
 
     const result = {};
-    const currentTime = new Date().toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      timeZone: 'America/New_York'
-    }).replace(/[\/,:\s]/g, '-');
 
-    console.log(currentTime);
 
 
     console.log('\n***\nRequest Params', req.query);
@@ -93,11 +84,14 @@ const find = async (req, res) => {
 
 
     if (subsidyFilter?.start_date)  {
-      subsidyFilter.start_date = {$gte: new Date(subsidyFilter.start_date)}    
+      subsidyFilter.start_date = {$gte: new Date(subsidyFilter.start_date)}
+      // Handle Range    
     }
 
     if (subsidyFilter?.end_date)  {
       subsidyFilter.end_date = {$lte: new Date(subsidyFilter.end_date)}    
+      // Handle Range    
+
     }
 
     const stringMatchFields = [
@@ -118,6 +112,17 @@ const find = async (req, res) => {
         model: Subsidy, //getModel[download.model] || Subsidy,
         populate: 'property_id'// download.populate || null
       });
+
+      const currentTime = new Date().toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        timeZone: 'America/New_York'
+      }).replace(/[\/,:\s]/g, '-');
+  
+      console.log(currentTime);
 
       const columns = [
         // { "header":"Id",
@@ -287,6 +292,8 @@ const find = async (req, res) => {
       model: Property,
       select: 'id, geometry'
     });
+
+    const features = result.properties.features.map()
 
     return res.json(result);
 

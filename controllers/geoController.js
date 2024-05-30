@@ -15,7 +15,17 @@ module.exports = {
           schoolzones: 'geojsons/ATL_SchoolZones.json',
           tads: 'geojsons/ATL_Tax_Allocation_District.json',
           tracts: 'geojsons/ATL_Tracts.json',
-          cities: 'geojsons/Cities_Georgia.json'
+          cities: 'geojsons/Cities_Georgia.json',
+          beltline: 'geojsons/Beltline_Trails.json',
+          race: 'layers/ATL_Race.json',
+          commute: 'layers/CommuteTime_Under25min_Tracts.json',
+          fooddeserts: 'layers/food_deserts.json',
+          ahloss: 'layers/Loss_AfordableHousing.json',
+          marta: 'layers/MARTA_BusyStops.json',
+          transitbuffer: 'layers/RailBusBuffer.json',
+          servicearea: 'layers/serviceAreaTransit84.json',
+          transitrail: 'layers/Transit_Rail_Stations.json',
+          rentincrease: 'layers/zillow_zip_rent_increase.json'
         }
 
 
