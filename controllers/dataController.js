@@ -293,7 +293,7 @@ const find = async (req, res) => {
       select: 'id, geometry'
     });
 
-    const features = result.properties.features.map()
+    // const features = result.properties.features.map()
 
     return res.json(result);
 
