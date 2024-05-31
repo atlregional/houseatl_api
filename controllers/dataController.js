@@ -1,4 +1,11 @@
-const { Property, Subsidy, Resident, Agency, Upload, Owner } = require('../models');
+const { 
+  Property,
+  Subsidy,
+  Resident,
+  Agency,
+  Upload,
+  Owner 
+} = require('../models');
 const { Parser } = require('json2csv');
 const ExcelJS = require('exceljs');
 // const {
@@ -67,8 +74,6 @@ const find = async (req, res) => {
 
     const result = {};
 
-
-
     console.log('\n***\nRequest Params', req.query);
     console.log('Request Body', req.body );
 
@@ -82,16 +87,28 @@ const find = async (req, res) => {
       return res.json(result);
     }
 
-
     if (subsidyFilter?.start_date)  {
-      subsidyFilter.start_date = {$gte: new Date(subsidyFilter.start_date)}
-      // Handle Range    
+      if (Array.isArray(subsidyFilter.start_date)) {
+        // Handle Range  
+        subsidyFilter.start_date = {
+          $gte: new Date(subsidyFilter.start_date?.[0] || '1970-01-01'),
+          $lte: new Date(subsidyFilter.start_date?.[1] || '9999-12-31'),
+        }
+      } else {
+        subsidyFilter.start_date = {$gte: new Date(subsidyFilter.start_date)}
+      }
     }
 
     if (subsidyFilter?.end_date)  {
-      subsidyFilter.end_date = {$lte: new Date(subsidyFilter.end_date)}    
-      // Handle Range    
-
+      if (Array.isArray(subsidyFilter.end_date)) {
+        // Handle Range  
+        subsidyFilter.end_date = {
+          $gte: new Date(subsidyFilter.end_date?.[0] || '1970-01-01'),
+          $lte: new Date(subsidyFilter.end_date?.[1] || '9999-12-31'),
+        }
+      } else {
+        subsidyFilter.end_date = {$gte: new Date(subsidyFilter.end_date)}
+      }
     }
 
     const stringMatchFields = [
@@ -302,6 +319,7 @@ const find = async (req, res) => {
   }
 };
 
+// Utility Functions
 function generateCSV(data, columns) {
   const opts = { fields: columns.map(col => ({ label: col.header, value: col.key })) };
   const parser = new Parser(opts);
