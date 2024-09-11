@@ -15,8 +15,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('tiny'));
 app.use(compression());
-app.use(cors());
-
+const corsOptions = {
+  exposedHeaders: 'Content-Disposition',
+};
+app.use(cors(corsOptions));
 // https://house-atl-api-dev.herokuapp.com/
 
 // app.use((req, res, next) => {

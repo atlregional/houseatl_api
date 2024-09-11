@@ -18,6 +18,7 @@ module.exports = {
           cities: 'geojsons/Cities_Georgia.json',
           beltline: 'geojsons/Beltline_Trails.json',
           race: 'layers/ATL_Race.json',
+          income: 'layers/ATL_Race.json',
           commute: 'layers/CommuteTime_Under25min_Tracts.json',
           fooddeserts: 'layers/food_deserts.json',
           ahloss: 'layers/Loss_AfordableHousing.json',

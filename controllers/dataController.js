@@ -8,6 +8,8 @@ const {
 } = require('../models');
 const { Parser } = require('json2csv');
 const ExcelJS = require('exceljs');
+const mongoose = require('mongoose');
+
 // const {
 //   calculateStats,
 //   handleSnapshotData,
@@ -87,11 +89,23 @@ const find = async (req, res) => {
       return res.json(result);
     }
 
+    if (subsidyFilter?.low_income_units)  {
+      if (Array.isArray(subsidyFilter.low_income_units)) {
+        // Handle Range  
+        subsidyFilter.low_income_units = {
+          $gte: Number(subsidyFilter.low_income_units?.[0] || 0),
+          $lte: Number(subsidyFilter.low_income_units?.[1] || 99999)
+        }
+      } else {
+        subsidyFilter.low_income_units = {$gte: new Date(subsidyFilter.low_income_units)}
+      }
+    }
+
     if (subsidyFilter?.start_date)  {
       if (Array.isArray(subsidyFilter.start_date)) {
         // Handle Range  
         subsidyFilter.start_date = {
-          $gte: new Date(subsidyFilter.start_date?.[0] || '1970-01-01'),
+          $gte: new Date(subsidyFilter.start_date?.[0] || '1900-01-01'),
           $lte: new Date(subsidyFilter.start_date?.[1] || '9999-12-31'),
         }
       } else {
@@ -103,7 +117,7 @@ const find = async (req, res) => {
       if (Array.isArray(subsidyFilter.end_date)) {
         // Handle Range  
         subsidyFilter.end_date = {
-          $gte: new Date(subsidyFilter.end_date?.[0] || '1970-01-01'),
+          $gte: new Date(subsidyFilter.end_date?.[0] || '1900-01-01'),
           $lte: new Date(subsidyFilter.end_date?.[1] || '9999-12-31'),
         }
       } else {
@@ -111,14 +125,42 @@ const find = async (req, res) => {
       }
     }
 
+    if (subsidyFilter?.risk_of_exp)  {
+      if (Array.isArray(subsidyFilter.risk_of_exp)) {
+        // Handle Range  
+        subsidyFilter.risk_of_exp = {
+          $gte: new Date(subsidyFilter.risk_of_exp?.[0] || '1900-01-01'),
+          $lte: new Date(subsidyFilter.risk_of_exp?.[1] || '9999-12-31'),
+        }
+      } else {
+        subsidyFilter.risk_of_exp = {$lte: new Date(subsidyFilter.risk_of_exp)}
+      }
+    }
+
+    if (subsidyFilter?.property_id) {
+      subsidyFilter.property_id = { 
+        $in: subsidyFilter.property_id.map(id => 
+          new mongoose.Types.ObjectId(id)) 
+      };
+    }
+
     const stringMatchFields = [
       'target_population',
-      'funding_sources'
+      'funding_sources',
+      'development_type'
     ]
 
     stringMatchFields.forEach(field => {
       if (subsidyFilter?.[field])  {
-        subsidyFilter[field] = new RegExp(subsidyFilter[field], 'i')   
+        if (Array.isArray(subsidyFilter[field])) {
+          const filterArray = [];
+          subsidyFilter[field].forEach(value => 
+            filterArray.push(new RegExp(value))
+          );
+          subsidyFilter[field] = { $in: filterArray };
+        } else {
+          subsidyFilter[field] = new RegExp(subsidyFilter[field]);   
+        }
       }      
     })
     
@@ -328,7 +370,7 @@ function generateCSV(data, columns) {
 
 async function generateXLSX(data, columns, res, currentTime) {
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Data');
+  const worksheet = workbook.addWorksheet('Subsidies');
 
   worksheet.columns = columns.map(col => ({ header: col.header, key: col.key }));
 
@@ -343,7 +385,7 @@ async function generateXLSX(data, columns, res, currentTime) {
   res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download-${currentTime}.xlsx`);
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
-  await workbook.xlsx.write(res);
+  await workbook.xlsx.write(res, { useStyles: true, useSharedStrings: true });
   res.end();
 };
 
@@ -395,24 +437,25 @@ function getDataFromModel({ id, model, filter, populate, select }) {
 async function getSubsidyStats(subsidyFilter) {
 
   const today = new Date();
-  const sixMonthsFromNow = new Date();
-  sixMonthsFromNow.setMonth(today.getMonth() + 6);
+  const onYearFromNow = new Date();
+  onYearFromNow.setFullYear(today.getFullYear() + 1);
 
   let risk_start_date_filter = null;
   let risk_end_date_filter = null;
 
   if (subsidyFilter?.start_date) {
-    if (subsidyFilter.start_date >= today && subsidyFilter.start_date <= sixMonthsFromNow) {
+    if (subsidyFilter.start_date >= today && subsidyFilter.start_date <= onYearFromNow) {
       risk_start_date_filter = { $gte: subsidyFilter.start_date };
     }
   }
   
   if (subsidyFilter?.end_date) {
-    if (subsidyFilter.end_date >= today && subsidyFilter.end_date <= sixMonthsFromNow) {
+    if (subsidyFilter.end_date >= today && subsidyFilter.end_date <= onYearFromNow) {
       risk_end_date_filter = { $lte: subsidyFilter.end_date };
     }
   }
-  
+
+  // console.log(subsidyFilter?.property_id)
 
   const agg = [
     {
@@ -426,7 +469,7 @@ async function getSubsidyStats(subsidyFilter) {
               {
                 '$and': [
                   {'$gte': ["$end_date", risk_start_date_filter || today] },
-                  {'$lte': ["$end_date", risk_end_date_filter ||sixMonthsFromNow] }
+                  {'$lte': ["$end_date", risk_end_date_filter ||onYearFromNow] }
                 ]
               },
               "$low_income_units",
@@ -454,8 +497,13 @@ async function getSubsidyStats(subsidyFilter) {
     }
   ];
 
+
   const stats = await Subsidy.aggregate(agg).exec();
-  return stats[0]
+  return stats?.[0] || {
+    totalSubsidizedUnits: 0,
+    totalAtRiskUnits: 0,
+    totalProperties: 0
+  }
 };
 
 module.exports = { findAll, find };
