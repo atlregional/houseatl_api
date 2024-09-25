@@ -60,6 +60,7 @@ const find = async (req, res) => {
       // propertyFilter, // property level filter
       // includeArray, // array of property IDs
       id,
+      ids,
       justStats, // just get the stats using the filter and include array
       justIDs, // return an array of property IDs 
       pagination,  // return property data in paginated chunks
@@ -86,6 +87,17 @@ const find = async (req, res) => {
         model: Property,
         populate: 'subsidies'
       })
+      return res.json(result);
+    }
+
+    if (ids) {
+      console.log('Get all data for list of properties', ids);
+      result.properties = await getDataFromModel({
+        ids,
+        model: Property,
+        populate: 'subsidies'
+      });
+      // console.log({result})
       return res.json(result);
     }
 
@@ -333,9 +345,9 @@ const find = async (req, res) => {
       return res.json(result);
     }
 
-    if (pagination) {
-      console.log('Paginated Data Requested for Page', pagination)
-    }
+    // if (pagination) {
+    //   console.log('Paginated Data Requested for Page', pagination)
+    // }
 
     if (populated) {
       console.log('Populated Property Data Requested')
@@ -408,22 +420,36 @@ function getAllDataFromModel(model, populate) {
   });
 };
 
-function getDataFromModel({ id, model, filter, populate, select }) {
+function getDataFromModel({ id, ids, model, filter, populate, select }) {
   return new Promise((resolve, reject) => {
     
-    const query = id 
-      ? model.findById(id).select(select) 
-      : model.find(filter || {}).select(select);
+    let query;
     
+    if (id) {
+      // Query for a single id
+      query = model.findById(id).select(select);
+    } else if (ids) {
+      // Query for an array of ids
+      const idArray = ids.split(',')
+        // Convert each string in the array to an ObjectId
+      const objectIdArray = idArray.map(id => new mongoose.Types.ObjectId(id));
+
+      query = model.find({ _id: { $in: objectIdArray } }).select(select);
+    } else {
+      // Query based on a filter
+      query = model.find(filter || {}).select(select);
+    }
+    
+    // Apply population if provided
     if (populate) {
       if (Array.isArray(populate)) {
-        populate.forEach(pop =>
-        query.populate(pop))
+        populate.forEach(pop => query.populate(pop));
       } else {
         query.populate(populate);
       }
     }
-    
+
+    // Execute the query
     query
       .then(result => {
         resolve(result);
@@ -433,6 +459,32 @@ function getDataFromModel({ id, model, filter, populate, select }) {
       });
   });
 };
+
+// function getDataFromModel({ id, model, filter, populate, select }) {
+//   return new Promise((resolve, reject) => {
+    
+//     const query = id 
+//       ? model.findById(id).select(select) 
+//       : model.find(filter || {}).select(select);
+    
+//     if (populate) {
+//       if (Array.isArray(populate)) {
+//         populate.forEach(pop =>
+//         query.populate(pop))
+//       } else {
+//         query.populate(populate);
+//       }
+//     }
+    
+//     query
+//       .then(result => {
+//         resolve(result);
+//       })
+//       .catch(err => {
+//         reject(err);
+//       });
+//   });
+// };
 
 async function getSubsidyStats(subsidyFilter) {
 
