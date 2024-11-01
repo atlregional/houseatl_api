@@ -15,16 +15,16 @@ const mongoose = require('mongoose');
 //   handleSnapshotData,
 //   downloadCSV
 // } = require('./propertiesController.utils');
-const util = require('util');
+// const util = require('util');
 
-const getModel = { 
-  property: Property,
-  subsidy: Subsidy,
-  resident: Resident,
-  agency: Agency,
-  upload: Upload,
-  owner: Owner 
-}
+// const getModel = { 
+//   property: Property,
+//   subsidy: Subsidy,
+//   resident: Resident,
+//   agency: Agency,
+//   upload: Upload,
+//   owner: Owner 
+// }
 
 const findAll = async (req, res) => {
   try {
@@ -73,6 +73,7 @@ const find = async (req, res) => {
     const {
       subsidyFilter, // subsidy level filter w/ {property_id: { $in: includeArray}}
       download, // return csv { fileType: 'csv' or 'xlsx', model: 'properties' or 'subsidies', populated: ''}
+      intersectingIDs // set $in query
     } = req.body;
 
     const result = {};
@@ -323,7 +324,10 @@ const find = async (req, res) => {
     }
 
     console.log('Getting Stats');
-    result.stats = await getSubsidyStats(subsidyFilter) 
+    result.stats = await getSubsidyStats(
+      subsidyFilter, 
+      intersectingIDs
+    ) 
 
     if (justStats) {
       console.log('Just Stats Requested');
@@ -486,7 +490,10 @@ function getDataFromModel({ id, ids, model, filter, populate, select }) {
 //   });
 // };
 
-async function getSubsidyStats(subsidyFilter) {
+async function getSubsidyStats(
+  subsidyFilter, 
+  intersectingIDs
+) {
 
   const today = new Date();
   const onYearFromNow = new Date();
@@ -507,8 +514,17 @@ async function getSubsidyStats(subsidyFilter) {
     }
   }
 
-  // console.log(subsidyFilter?.property_id)
+  // if (intersectingIDs) {
+  //   const array = intersectingIDs || []
+  //   subsidyFilter.property_id = {$in: [...array]}
+  // }
 
+  if (intersectingIDs) {
+    const array = intersectingIDs.map(id => new mongoose.Types.ObjectId(id));
+    subsidyFilter.property_id = { $in: array };
+  }
+  
+  
   const agg = [
     {
       '$match': subsidyFilter || {}
@@ -529,9 +545,18 @@ async function getSubsidyStats(subsidyFilter) {
             ]          
           }
         },
-        'maxLowIncomeUnits': {
-          '$max': '$low_income_units'
+        'maxLowIncomeUnits':  {
+          '$max': {
+            '$cond': [
+              {'$gte': ["$end_date", today] },
+              "$low_income_units",
+              0 // default value if condition is not met
+            ]          
+          }       
         }
+        // {
+        //   '$max': '$low_income_units'
+        // }
       }
     }, {
       '$group': {
