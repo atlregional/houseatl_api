@@ -179,6 +179,10 @@ const find = async (req, res) => {
     
     if (download || downloadCSV || downloadXLSX) {
       console.log('CSV Download Requested');
+      if (intersectingIDs) {
+        const array = intersectingIDs.map(id => new mongoose.Types.ObjectId(id));
+        subsidyFilter.property_id = { $in: array };
+      }
       const data = await getDataFromModel({
         filter: subsidyFilter || {},
         model: Subsidy, //getModel[download.model] || Subsidy,
