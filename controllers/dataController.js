@@ -201,9 +201,9 @@ const find = async (req, res) => {
       console.log(currentTime);
 
       const columns = [
-        // { "header":"Id",
-        //   "key": ""
-        // },
+        { "header":"Property ID",
+          "key": "property_id._id"
+        },
         { 
           "header":"Project Name",
           "key": "project_name"
@@ -390,17 +390,36 @@ function generateCSV(data, columns) {
 
 async function generateXLSX(data, columns, res, currentTime) {
   const workbook = new ExcelJS.Workbook();
+  const worksheet2 = workbook.addWorksheet('Properties');
   const worksheet = workbook.addWorksheet('Subsidies');
 
-  worksheet.columns = columns.map(col => ({ header: col.header, key: col.key }));
+  worksheet.columns = columns.filter(col => col.key === 'property_id._id' || !col.key.includes('property_id')).map(col => ({ header: col.header, key: col.key }));
+  worksheet2.columns = columns.filter(col => col.key.includes('property_id') ).map(col => ({ header: col.header, key: col.key }));
 
   data.forEach(item => {
     const row = {};
     columns.forEach(col => {
       row[col.key] = col.key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
     });
+    row['property_id._id'] = row['property_id._id']?.toString().replace(/"/g, '');
     worksheet.addRow(row);
+    // worksheet2.addRow(row);
   });
+
+  const propertyIDs = [];
+  data.forEach(item => {
+    const row = {};
+    columns.forEach(col => {
+      row[col.key] = col.key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
+    });
+    if (!propertyIDs.includes(row['property_id._id'])) {
+      row['property_id._id'] = row['property_id._id']?.toString().replace(/"/g, '');
+      worksheet2.addRow(row)
+      propertyIDs.push(row['property_id._id']);
+    }
+  });
+
+
 
   res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download-${currentTime}.xlsx`);
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
