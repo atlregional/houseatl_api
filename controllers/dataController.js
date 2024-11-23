@@ -412,7 +412,7 @@ async function generateXLSX(data, columns, res, currentTime) {
     columns.forEach(col => {
       row[col.key] = col.key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
     });
-    if (!propertyIDs.includes(row['property_id._id'])) {
+    if (!propertyIDs.includes(row['property_id._id']?.toString().replace(/"/g, ''))) {
       row['property_id._id'] = row['property_id._id']?.toString().replace(/"/g, '');
       worksheet2.addRow(row)
       propertyIDs.push(row['property_id._id']?.toString().replace(/"/g, ''));
