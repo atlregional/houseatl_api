@@ -415,7 +415,7 @@ async function generateXLSX(data, columns, res, currentTime) {
     if (!propertyIDs.includes(row['property_id._id'])) {
       row['property_id._id'] = row['property_id._id']?.toString().replace(/"/g, '');
       worksheet2.addRow(row)
-      propertyIDs.push(row['property_id._id']);
+      propertyIDs.push(row['property_id._id']?.toString().replace(/"/g, ''));
     }
   });
 
