@@ -1,14 +1,14 @@
 // User, Properties, Subsidies, resident, agencies, uploads, owners
 const router = require('express').Router();
 
-const propertyRoutes = require('./properties'),
-  subsidyRoutes = require('./subsidies'),
-  residentRoutes = require('./residents'),
-  agencyRoutes = require('./agencies'),
-  uploadRoutes = require('./uploads'),
-  ownerRoutes = require('./owners'),
-  propertyGeoRoutes = require('./propertyGeo'),
-  dataRoutes = require('./data'),
+// const propertyRoutes = require('./properties'),
+//   subsidyRoutes = require('./subsidies'),
+//   residentRoutes = require('./residents'),
+//   agencyRoutes = require('./agencies'),
+//   uploadRoutes = require('./uploads'),
+//   ownerRoutes = require('./owners'),
+//   propertyGeoRoutes = require('./propertyGeo'),
+const  dataRoutes = require('./data'),
   geoRoutes = require('./geos');
 
 // router.use('/rest/properties', propertyRoutes);

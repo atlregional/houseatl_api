@@ -73,7 +73,7 @@ const find = async (req, res) => {
     const {
       subsidyFilter, // subsidy level filter w/ {property_id: { $in: includeArray}}
       download, // return csv { fileType: 'csv' or 'xlsx', model: 'properties' or 'subsidies', populated: ''}
-      intersectingIDs // set $in query
+      intersectingIDs, // set $in query
     } = req.body;
 
     const result = {};
@@ -178,7 +178,7 @@ const find = async (req, res) => {
     })
     
     if (download || downloadCSV || downloadXLSX) {
-      console.log('CSV Download Requested');
+      console.log('Download Requested', {download, downloadCSV, downloadXLSX});
       if (intersectingIDs) {
         const array = intersectingIDs.map(id => new mongoose.Types.ObjectId(id));
         subsidyFilter.property_id = { $in: array };
@@ -189,6 +189,20 @@ const find = async (req, res) => {
         populate: 'property_id'// download.populate || null
       });
 
+      let allSubsides = null;
+      if (download.includeAll) {
+        allSubsides = await getDataFromModel({
+          model: Subsidy,
+          filter: { property_id: { $in: [...new Set(data.map(({property_id}) => property_id))] } },
+          populate: 'property_id'
+        });
+        console.log({
+          totalProperties: [...new Set(data.map(({property_id}) => property_id))].length,
+          withoutIncludeAll: data.length, 
+          includeAll: allSubsides.length
+        });
+      }
+
       const currentTime = new Date().toLocaleString('en-US', {
         year: 'numeric',
         month: 'numeric',
@@ -196,7 +210,7 @@ const find = async (req, res) => {
         hour: 'numeric',
         minute: 'numeric',
         timeZone: 'America/New_York'
-      }).replace(/[\/,:\s]/g, '-');
+      }).replace(/[\/,:\s]/g, '-') + '-EST';
   
       console.log(currentTime);
 
@@ -314,13 +328,19 @@ const find = async (req, res) => {
         }
       ];
 
+      const returnData = allSubsides || data;
+      const withFilter = Object.keys(subsidyFilter || {}).length > 0;
+      let fileNameAppend = withFilter ? '-Filtered-Properties' : '-All-Properites-And-Subsidies';
+      fileNameAppend = withFilter ? allSubsides ? `${fileNameAppend}-With-Unfiltered-Subsidies` : `${fileNameAppend}-And-Subsidies` : fileNameAppend;
+  
+
       if (download?.type === 'csv' || downloadCSV ) {
-        const csvData = generateCSV(data, columns);
-        res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download-${currentTime}.csv`);
+        const csvData = generateCSV(returnData, columns);
+        res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download${fileNameAppend}-${currentTime}.csv`);
         res.setHeader('Content-Type', 'text/csv');
         res.send(csvData);
       } else if (download?.type === 'xlsx' || downloadXLSX) {
-        await generateXLSX(data, columns, res, currentTime);
+        await generateXLSX(returnData, columns, res, currentTime, fileNameAppend);
       } else {
         res.status(400).send('Unsupported download type');
       }
@@ -369,7 +389,7 @@ const find = async (req, res) => {
     // ELSE JUST SEND BARE GEO PROPERTY GEOMETRIES
     result.properties = await getDataFromModel({
       model: Property,
-      select: 'id, geometry'
+      select: ['id', 'geometry', 'name', 'total_units', 'updated_on']
     });
 
     // const features = result.properties.features.map()
@@ -388,7 +408,7 @@ function generateCSV(data, columns) {
   return parser.parse(data);
 };
 
-async function generateXLSX(data, columns, res, currentTime) {
+async function generateXLSX(data, columns, res, currentTime, fileNameAppend) {
   const workbook = new ExcelJS.Workbook();
   const worksheet2 = workbook.addWorksheet('Properties');
   const worksheet = workbook.addWorksheet('Subsidies');
@@ -421,7 +441,7 @@ async function generateXLSX(data, columns, res, currentTime) {
 
 
 
-  res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download-${currentTime}.xlsx`);
+  res.setHeader('Content-Disposition', `attachment; filename=HouseATL-Download${fileNameAppend}-${currentTime}.xlsx`);
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
   await workbook.xlsx.write(res, { useStyles: true, useSharedStrings: true });
@@ -449,7 +469,7 @@ function getAllDataFromModel(model, populate) {
 
 function getDataFromModel({ id, ids, model, filter, populate, select }) {
   return new Promise((resolve, reject) => {
-    
+    console.log(select)
     let query;
     
     if (id) {
