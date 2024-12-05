@@ -215,10 +215,10 @@ const find = async (req, res) => {
       console.log(currentTime);
 
       const columns = [
-        { "header":"Subsidy ID",
+        { "header":"HouseATL Subsidy ID",
           "key": "_id"
         },
-        { "header":"Property ID",
+        { "header":"HouseATL Property ID",
           "key": "property_id._id"
         },
         { 
@@ -425,6 +425,7 @@ async function generateXLSX(data, columns, res, currentTime, fileNameAppend) {
       row[col.key] = col.key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
     });
     row['property_id._id'] = row['property_id._id']?.toString().replace(/"/g, '');
+    row['_id'] = row['_id']?.toString().replace(/"/g, '');
     worksheet.addRow(row);
     // worksheet2.addRow(row);
   });
