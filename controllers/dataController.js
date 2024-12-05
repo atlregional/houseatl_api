@@ -215,6 +215,9 @@ const find = async (req, res) => {
       console.log(currentTime);
 
       const columns = [
+        { "header":"Subsidy ID",
+          "key": "_id"
+        },
         { "header":"Property ID",
           "key": "property_id._id"
         },
