@@ -4,7 +4,7 @@ const { createDedupSubAndAddToSubUpdate } = require('./helpers');
 module.exports = {
 	async getSubsidy(id) {
 		return await db.Subsidy.findById(id)
-			.populate('funding_sources')
+			// .populate('funding_sources')
 			.populate('uploads');
 	},
 	async updateDuplicatedSubsidy({

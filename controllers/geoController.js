@@ -8,6 +8,7 @@ module.exports = {
         key = key?.toLowerCase().trim().replace(/ /g, '');
 
         const filepath = {
+          // Reference Layers
           citycouncil: 'geojsons/ATL_City_Council_District.json',
           highschoolzones: 'geojsons/ATL_HighSchoolZones.json',
           nsas: 'geojsons/ATL_Neighborhood_Statistical_Areas.json',
@@ -17,6 +18,10 @@ module.exports = {
           tracts: 'geojsons/ATL_Tracts.json',
           cities: 'geojsons/Cities_Georgia.json',
           beltline: 'geojsons/Beltline_Trails.json',
+          counties: 'geojsons/5CoreCounties.json',
+          // schooldistricts: 'geojsons/5CountySchoolDistricts.json',
+
+          // Data Lyers
           race: 'layers/ATL_Race.json',
           income: 'layers/ATL_Race.json',
           commute: 'layers/CommuteTime_Under25min_Tracts.json',
@@ -26,7 +31,7 @@ module.exports = {
           transitbuffer: 'layers/RailBusBuffer.json',
           servicearea: 'layers/serviceAreaTransit84.json',
           transitrail: 'layers/Transit_Rail_Stations.json',
-          rentincrease: 'layers/zillow_zip_rent_increase.json'
+          rentincrease: 'layers/zillow_zip_rent_increase.json',
         }
 
 

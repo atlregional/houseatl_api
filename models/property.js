@@ -20,6 +20,7 @@ const PropertySchema = Schema(
 		school_zone: { type: String },
 		high_school_zone: { type: String },
 		total_units: { type: Number },
+    owner_name: { type: String },
 		owner_id: { type: Schema.Types.ObjectId, ref: 'owner' },
 		subsidies: [{ type: Schema.Types.ObjectId, ref: 'subsidy' }],
 		upload_id: { type: Schema.Types.ObjectId, ref: 'upload' },

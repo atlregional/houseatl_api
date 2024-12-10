@@ -1,6 +1,6 @@
 module.exports = {
 	CityCouncilDistricts: {
-		geoJSON: require('../../geojsons/ATL_City_Council_Districtswgs.json'),
+		geoJSON: require('../../geojsons/ATL_City_Council_District.json'),
 		propertiesKey: 'NAME',
 		modelKey: 'city_council_district'
 	},

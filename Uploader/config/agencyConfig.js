@@ -95,7 +95,7 @@ const initialMethods = {
 			case 'int':
 				return parseInt(val);
 			case 'date':
-				return this.handleDate(val);
+				return val ? new Date(val) : null;
 			default:
 				return val;
 		}
@@ -113,40 +113,46 @@ const initialMethods = {
 		});
 
     // CONVERVERTES AND OVERWRITERS
-
     if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Subsidy') {
       if (item[mapping['low_income_units']]) {
         const lowIncomeUnits = item[mapping['low_income_units']].split(' ')[0]
         obj['low_income_units'] = lowIncomeUnits;
       }
       
-      const dateValue = item[mapping['risk_of_exp']] 
-        ? this.handleDate(item[mapping['risk_of_exp']]) 
-        : null;
+      // const dateValue = item[mapping['risk_of_exp']] 
+      //   ? this.handleDate(item[mapping['risk_of_exp']]) 
+      //   : null;
+      const startDate = item[mapping['start_date']]
+      const endDate = item[mapping['end_date']]
+      const riskDate = item[mapping['risk_of_exp']]
 
-      if (dateValue) {
-        obj['risk_of_exp'] = moment(new Date(dateValue)).subtract(1, 'day').format('M/D/YYYY');
-        obj['start_date'] = moment(new Date(dateValue)).subtract(15, 'year').format('M/D/YYYY');
-        obj['end_date'] = moment(new Date(dateValue)).add(15, 'year').subtract(1, 'day').format('M/D/YYYY')
+      if (item[mapping['funding_sources']] === 'LIHTC') {
+        obj['risk_of_exp'] = riskDate ? new Date(riskDate) : null;
+        obj['start_date'] = startDate 
+          ? new Date(startDate) 
+          : riskDate 
+          ? new Date(moment(new Date(riskDate)).subtract(15, 'years').format('M/D/YYYY')) 
+            : null;
+        obj['end_date'] = endDate 
+          ? new Date(endDate)
+          : riskDate
+          ? new Date(moment(new Date(riskDate)).add(15, 'years').subtract(1, 'day').format('M/D/YYYY'))
+            : null;
+
+        // obj['risk_of_exp'] = new Date(moment(new Date(dateValue)).subtract(1, 'day').format('M/D/YYYY'));
+        // obj['start_date'] = new Date(moment(new Date(dateValue)).subtract(15, 'year').format('M/D/YYYY'));
+        // obj['end_date'] = new Date(moment(new Date(dateValue)).add(15, 'year').subtract(1, 'day').format('M/D/YYYY'))
       } else {
-        obj['risk_of_exp'] = '';
+        obj['start_date'] = startDate ? new Date(startDate) : null;
+        obj['end_date'] = endDate ? new Date(endDate) : null;
+        obj['risk_of_exp'] = null;
       }
       
+      obj['target_population'] = item?.['target_population']?.split(' ').reverse()?.[0] || '';
+      obj['funding_sources'] = 'LIHTC'
     }
-    if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Resident') {
-      const targetPopulation = item[mapping['type_1']] 
-        ? item[mapping['type_1']].split(' ').reverse()[0] 
-        : ''
-      obj['type_1'] = targetPopulation;
-    }
-    if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Property') {
-      obj['city'] = 'Atlanta'
-    }
-    if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Funding_Source') {
-      obj['source_1'] = 'LIHTC'
-    }
-    if (this.agencyName === 'Atlanta Housing' && type === 'Funding_Source'){
-			obj['source_1'] = 'HomeFlex';
+    if (this.agencyName === 'Atlanta Housing' && type === 'Subsidy'){
+			obj['funding_sources'] = 'HomeFlex';
     }
 
 		return obj;
@@ -203,58 +209,64 @@ module.exports = {
 	NHPD: {
 		...initialMethods,
 		agencyName: 'National Housing Preservation Database',
-		cityKey: 'City',
+    statusKey: 'Subsidy Status',
 		fundingSrcNameKey: 'Subsidy Name',
 		acceptedFundingSrc: ['HOME', 'Section 8', 'Section 202', 'Public Housing'],
 		xlsxRange: 0,
 		preFilter(obj) {
-			if (obj[this.fundingSrcNameKey] && obj[this.cityKey]) {
-				return helpers.filterByCityAndAcceptedFundingArr({
-					cityVal: obj[this.cityKey].toUpperCase(),
-					fundingVal: obj[this.fundingSrcNameKey],
-					acceptedFundingArr: this.acceptedFundingSrc
-				});
-			} else if (obj[this.cityKey])
-				return obj[this.cityKey].toUpperCase() === 'ATLANTA';
+			if (
+        this.acceptedFundingSrc.includes(`${obj[this.fundingSrcNameKey]}`.trim()) &&
+        `${obj[this.statusKey]}` === 'Active'
+      ) {
+        return true;
+      }
+      return false;
+			// if (obj[this.fundingSrcNameKey] && obj[this.cityKey]) {
+			// 	return helpers.filterByCityAndAcceptedFundingArr({
+			// 		cityVal: obj[this.cityKey].toUpperCase(),
+			// 		fundingVal: obj[this.fundingSrcNameKey],
+			// 		acceptedFundingArr: this.acceptedFundingSrc
+			// 	});
+			// } else if (obj[this.cityKey])
+			// 	return obj[this.cityKey].toUpperCase() === 'ATLANTA';
 
-			return false;
+			// return false;
 		}
 	},
-	InvestAtlanta: {
-		...initialMethods,
-		agencyName: 'Invest Atlanta',
-		cityKey: '',
-		xlsxRange: 3,
-		// Dates come in as MM-YY
-		handleDate(value) {
-			const dateArr = value.split('-');
-			if (!dateArr[0] || !dateArr[1]) return '';
+	// InvestAtlanta: {
+	// 	...initialMethods,
+	// 	agencyName: 'Invest Atlanta',
+	// 	cityKey: '',
+	// 	xlsxRange: 3,
+	// 	// Dates come in as MM-YY
+	// 	handleDate(value) {
+	// 		const dateArr = value.split('-');
+	// 		if (!dateArr[0] || !dateArr[1]) return '';
 
-			const month = new Date(`${dateArr[0]}-01-20${dateArr[1]}`).getMonth() + 1;
+	// 		const month = new Date(`${dateArr[0]}-01-20${dateArr[1]}`).getMonth() + 1;
 
-			return `${helpers.formatDate(month, 'month')}/01/${helpers.formatDate(
-				dateArr[1],
-				'year'
-			)}`;
-		},
-		createCollectionObj(type, item) {
-			const mapping = this.getMapping()[type];
-			const dataTypes = this.getDataTypesMapping()[type];
-			const obj = {};
+	// 		return `${helpers.formatDate(month, 'month')}/01/${helpers.formatDate(
+	// 			dateArr[1],
+	// 			'year'
+	// 		)}`;
+	// 	},
+	// 	createCollectionObj(type, item) {
+	// 		const mapping = this.getMapping()[type];
+	// 		const dataTypes = this.getDataTypesMapping()[type];
+	// 		const obj = {};
 
-			// Item: value from file, Key: key we want for db, Value: Header from file
-			Object.entries(mapping).forEach(([key, value]) => {
-				value && typeof value !== 'object'
-					? (obj[key] = this.handleDataType(dataTypes[key], item[value]))
-					: // AMI is split up into headers based on BR size
-					value && typeof value === 'object'
-					? (obj[key] = this.handleDataType(
-							dataTypes[key],
-							helpers.calculateTotal(item, value)
-					  ))
-					: (obj[key] = '');
-			});
-			return obj;
-		}
-	}
+	// 		// Item: value from file, Key: key we want for db, Value: Header from file
+	// 		Object.entries(mapping).forEach(([key, value]) => {
+	// 			value && typeof value !== 'object'
+	// 				? (obj[key] = this.handleDataType(dataTypes[key], item[value]))
+  //         : value && typeof value === 'object'
+	// 				? (obj[key] = this.handleDataType(
+	// 						dataTypes[key],
+	// 						helpers.calculateTotal(item, value)
+	// 				  ))
+	// 				: (obj[key] = '');
+	// 		});
+	// 		return obj;
+	// 	}
+	// }
 };

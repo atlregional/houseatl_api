@@ -1,7 +1,8 @@
-const { Client } = require('@googlemaps/google-maps-services-js');
+// const { Client } = require('@googlemaps/google-maps-services-js');
 const apiKey = process.env.GOOGLE_API_KEY;
-const client = new Client();
+// const client = new Client();
 const turf = require('@turf/turf');
+const axios = require('axios');
 const coaGeoJSON = require('../geojsons/Cities_Georgia.json');
 const geojsonConfig = require('./config/geojsonConfig');
 const {
@@ -44,7 +45,7 @@ const turfHandler = {
 	}
 };
 
-const clientHandler = async ({
+const geocodeHandler = async ({
 	name,
 	original_address,
 	updated_address,
@@ -70,20 +71,28 @@ const clientHandler = async ({
 			: null;
 
 	if (location) {
-		const { data } = await client.geocode({
-			params: {
-				[param]: location,
-				key: apiKey
-			},
-			timeout: 2000
-		});
+		const { data } = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        [param]: location,
+        key: apiKey
+      }
+    });
+      
+    // await client.geocode({
+		// 	params: {
+		// 		[param]: location,
+		// 		key: apiKey
+		// 	},
+		// 	timeout: 2000
+		// });
+    // console.log(data);
 
 		const geocodedObj = { ...data.results[0] };
 
 		if (geocodedObj.partial_match && latitude && longitude && !partialMatch) {
 			partialMatch = true;
 
-			return clientHandler({
+			return geocodeHandler({
 				name,
 				original_address,
 				city,
@@ -114,7 +123,7 @@ const clientHandler = async ({
 			) {
 				partialMatch = true;
 
-				return clientHandler({
+				return geocodeHandler({
 					name,
 					original_address,
 					city,
@@ -164,7 +173,7 @@ const Geocoder = async ({
 	latitude,
 	longitude
 }) => {
-	const { data, error } = await clientHandler({
+	const { data, error } = await geocodeHandler({
 		name,
 		original_address,
 		city,
@@ -199,6 +208,7 @@ const Geocoder = async ({
 		obj['address'] = data['formatted_address'];
 		obj['latitude'] = data['geometry']['location']['lat'];
 		obj['longitude'] = data['geometry']['location']['lng'];
+    obj['county'] = obj?.['county']?.replace(' County', '') || null;
 
 		obj['geometry'] = {
 			type: 'Point',
@@ -208,18 +218,18 @@ const Geocoder = async ({
 			]
 		};
 
-		const isInCOA = await turfHandler.pointInCOA(
-			obj['geometry']['coordinates']
-		);
+		// const isInCOA = await turfHandler.pointInCOA(
+		// 	obj['geometry']['coordinates']
+		// );
 
-		if (!isInCOA) {
-			const { data, error } = handleError(obj['address'], 'Not in COA');
+		// if (!isInCOA) {
+		// 	const { data, error } = handleError(obj['address'], 'Not in COA');
 
-			return {
-				geocodedObj: data,
-				error
-			};
-		}
+		// 	return {
+		// 		geocodedObj: data,
+		// 		error
+		// 	};
+		// }
 
 		const geojsonPropertiesObj = await turfHandler.getPropertiesFromGeoJSONs(
 			obj['geometry']['coordinates']

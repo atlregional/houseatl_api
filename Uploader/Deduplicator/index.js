@@ -36,38 +36,38 @@ const updateSubsidy = async props => {
 			});
 		}
 
-		const { existingFundingArr, newFundingArr } = createFundingArrays(
-			existingSubsidy.funding_sources,
-			newFundingSrc
-		);
+		// const { existingSubsidy.funding_sources, newSubsidy.funding_sources } = createFundingArrays(
+		// 	existingSubsidy.funding_sources,
+		// 	`${newFundingSrc}`.split(',')
+		// );
 
 		const configObj = { update: true, type: 'update_all', existingAgencyId };
 
 		if (
-			existingFundingArr.includes('HOME') &&
-			newFundingArr.includes('HOME') &&
+			existingSubsidy.funding_sources.includes('HOME') &&
+			newSubsidy.funding_sources.includes('HOME') &&
 			getTime(newSubsidy.start_date) > getTime(existingSubsidy.start_date) &&
 			getTime(newSubsidy.end_date) > getTime(existingSubsidy.end_date) &&
 			agencyId.toString() === existingAgencyId.toString()
 		) {
 			console.log('Duplicate: update all');
 		} else if (
-			existingFundingArr.includes('HOME') &&
-			newFundingArr.includes('HOME') &&
+			existingSubsidy.funding_sources.includes('HOME') &&
+			newSubsidy.funding_sources.includes('HOME') &&
 			agencyId.toString() === existingAgencyId.toString()
 		) {
 			console.log('Duplicate: update null');
 			configObj.type = 'update_null';
 		} else if (
-		// 	existingFundingArr.includes('LIHTC') &&
-		// 	newFundingArr.includes('LIHTC') &&
+		// 	existingSubsidy.funding_sources.includes('LIHTC') &&
+		// 	newSubsidy.funding_sources.includes('LIHTC') &&
 		// 	agencyId.toString() === existingAgencyId.toString()
     // ) {
 		// 	console.log('Duplicate: update null');
 		// 	configObj.type = 'update_null';
     // } else if (
-			existingFundingArr.includes('HOME') &&
-			newFundingArr.includes('HOME')
+			existingSubsidy.funding_sources.includes('HOME') &&
+			newSubsidy.funding_sources.includes('HOME')
 		) {
 			console.log('Rejected: create new record');
 			configObj.update = false;
@@ -109,20 +109,20 @@ const updateSubsidy = async props => {
 const evaluateSubsidies = ({
 	existingSubsidy,
 	newSubsidy,
-	newFundingSrc,
+	// newFundingSrc,
 	agencyId,
 	existingAgencyId
 }) => {
-	const { existingFundingArr, newFundingArr } = createFundingArrays(
-		existingSubsidy.funding_sources,
-		newFundingSrc
-	);
+	// const { existingSubsidy.funding_sources, newSubsidy.funding_sources } = createFundingArrays(
+	// 	existingSubsidy.funding_sources,
+	// 	newFundingSrc
+	// );
 
-	if (existingFundingArr.includes('HOME') && newFundingArr.includes('HOME')) {
+	if (existingSubsidy.funding_sources.includes('HOME') && newSubsidy.funding_sources.includes('HOME')) {
 		console.log('Update: Both HOME');
 		return { action: 'update' };
 	} else if (
-		JSON.stringify(existingFundingArr) !== JSON.stringify(newFundingArr)
+		JSON.stringify(existingSubsidy.funding_sources) !== JSON.stringify(newSubsidy.funding_sources)
 	) {
 		console.log('Reject: create new record');
 		return { action: 'create' };
@@ -144,8 +144,8 @@ const evaluateSubsidies = ({
 		return { action: 'update' };
 	} 
   // else if (
-  //     newFundingArr.includes('LIHTC') && 
-  //     existingFundingArr.includes('LIHTC') &&
+  //     newSubsidy.funding_sources.includes('LIHTC') && 
+  //     existingSubsidy.funding_sources.includes('LIHTC') &&
   //     getTime(newSubsidy.risk_of_exp) === getTime(existingSubsidy.risk_of_exp)
   // ) {
   //   console.log('Update: LIHTC same risk date')
@@ -159,13 +159,16 @@ const evaluateSubsidies = ({
 };
 
 const deduplicateSubsidies = async props => {
-	const { existingSubId, newSubsidy, newFundingSrc, agencyId } = props;
+	const { 
+    existingSubId, 
+    newSubsidy, 
+    // newFundingSrc, 
+    agencyId 
+  } = props;
 
 	try {
 		if (existingSubId) {
 			const existingSubsidy = await getSubsidy(existingSubId);
-
-
 
         const existingAgencyId = existingSubsidy
           ? existingSubsidy.uploads[existingSubsidy.uploads.length - 1].agency_id

@@ -45,11 +45,12 @@ module.exports = {
 			longitude: 'Longitude',
 			latitude: 'Latitude',
 			county: '',
-			total_units: 'Known Total Units'
+			total_units: 'Known Total Units',
+      owner_name: 'Owner Name',
 		},
-		Owner: {
-			name: 'Owner Name'
-		},
+		// Owner: {
+		// 	name: 'Owner Name'
+		// },
 		Subsidy: {
 			project_name: 'Property Name',
 			development_type: 'Construction Type',
@@ -62,16 +63,19 @@ module.exports = {
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: 'Assisted Units'
+			low_income_units: 'Assisted Units',
+      target_population: 'Target Population',
+      funding_sources: 'Subsidy Name'
+
 		},
-		Resident: {
-			type_1: 'Target Population',
-			type_2: ''
-		},
-		Funding_Source: {
-			source_1: 'Subsidy Name',
-			source_2: ''
-		}
+		// Resident: {
+		// 	type_1: 'Target Population',
+		// 	type_2: ''
+		// },
+		// Funding_Source: {
+		// 	source_1: 'Subsidy Name',
+		// 	source_2: ''
+		// }
 	},
 	'Georgia Department of Community Affairs': {
 		Property: {
@@ -80,16 +84,16 @@ module.exports = {
 			city: 'Project City',
 			zip: 'Project Zip Code',
 			county: 'Project County',
-			total_units: 'Total Units'
-		},
-		Owner: {
-			name: 'Owner'
+			total_units: 'Total Units',
+		// },
+		// Owner: {
+			owner_name: 'Owner Full Name'
 		},
 		Subsidy: {
 			project_name: 'Project Name',
 			development_type: 'Project Type',
-			start_date: '', // 'Affordability Start Date' for HUD HOME , 
-			end_date:  '', // 'Affordability End Date' for HUD HOME,
+			start_date: 'Program Restriction Start Date_1', // 'Affordability Start Date' for HUD HOME , 
+			end_date:  'Program Restriction End Date_1', // 'Affordability End Date' for HUD HOME,
 			risk_of_exp: 'Extended Period Start Date', // CONVERTER ADDED TO SUBTRACT BY ONE DAY
 			ami_30: '',
 			ami_50: '',
@@ -98,18 +102,19 @@ module.exports = {
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: 'Targeted Population' // CONVERTER ADDED TO TAKE FIRST STRING VALUE
+			low_income_units: 'Targeted Population_1',
+      funding_sources: 'Project Funding Source_1' // CONVERTER ADDED TO TAKE FIRST STRING VALUE
 		},
-		Resident: {
-			type_1: 'Targeted Population', // CONVERTER ADDED TO TAKE LAST STRING VALUE
-			type_2: ''
-		},
-		// Only take LIHTC from DCA
-		Funding_Source: {
-			source_1: 'Project Funding Source', // USE LINES 130 AND 157 OF agencyConfig TO SET 
-			source_2: ''
-			// source_2: 'Secondary Funding Source'
-		}
+		// Resident: {
+		// 	type_1: 'Targeted Population', // CONVERTER ADDED TO TAKE LAST STRING VALUE
+		// 	type_2: ''
+		// },
+		// // Only take LIHTC from DCA
+		// Funding_Source: {
+		// 	source_1: 'Project Funding Source_1', // USE LINES 130 AND 157 OF agencyConfig TO SET 
+		// 	source_2: ''
+		// 	// source_2: 'Secondary Funding Source'
+		// }
 	},
 	'City of Atlanta': {
 		Property: {

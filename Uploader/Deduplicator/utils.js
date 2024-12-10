@@ -10,7 +10,7 @@ module.exports = {
 	},
 	createFundingArrays(existingRecord, newRecord) {
 		return {
-			existingFundingArr: existingRecord.map(({ source }) => source),
+			existingFundingArr: `${existingRecord}`.split(','),
 			newFundingArr: Object.values(newRecord).filter(item => item)
 		};
 	},
