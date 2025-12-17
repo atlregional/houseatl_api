@@ -92,9 +92,9 @@ module.exports = {
 		Subsidy: {
 			project_name: 'Project Name',
 			development_type: 'Project Type',
-			start_date: 'Program Restriction Start Date_1', // 'Affordability Start Date' for HUD HOME , 
-			end_date:  'Program Restriction End Date_1', // 'Affordability End Date' for HUD HOME,
-			risk_of_exp: 'Extended Period Start Date', // CONVERTER ADDED TO SUBTRACT BY ONE DAY
+			start_date: 'Program Restriction Start Date_2', // 'Affordability Start Date' for HUD HOME , 
+			end_date:  'Program Restriction End Date_2', // 'Affordability End Date' for HUD HOME,
+			risk_of_exp: '', // 'Extended Period Start Date', // CONVERTER ADDED TO SUBTRACT BY ONE DAY
 			ami_30: '',
 			ami_50: '',
 			ami_60: '',
@@ -102,8 +102,9 @@ module.exports = {
 			ami_100: '',
 			ami_115: '',
 			ami_120: '',
-			low_income_units: 'Targeted Population_1',
-      funding_sources: 'Project Funding Source_1' // CONVERTER ADDED TO TAKE FIRST STRING VALUE
+      target_population: 'Targeted Population_2', // CONVERTER ADDED TO TAKE LAST STRING VALUE
+			low_income_units: 'Total LI Units',
+      funding_sources: 'Project Funding Source_2' // CONVERTER ADDED TO TAKE FIRST STRING VALUE
 		},
 		// Resident: {
 		// 	type_1: 'Targeted Population', // CONVERTER ADDED TO TAKE LAST STRING VALUE

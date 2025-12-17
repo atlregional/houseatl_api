@@ -37,14 +37,16 @@ const helpers = {
 
 const initialMethods = {
 	preFilter(obj) {
-		if (this.cityKey) return obj[this.cityKey].toUpperCase() === 'ATLANTA';
+		// if (this.cityKey) return obj[this.cityKey].toUpperCase() === 'ATLANTA';
 		return true; // no cityKey all docs returned: City of Atlanta, Invest Atlanta
 	},
 	async excelToJSON(file, sheet) {
+    // console.log('file', file, sheet)
 		const options = { defval: '', raw: false };
 		if (this.xlsxRange > 0) options['range'] = this.xlsxRange; // Range helps identify the header row in an XLSX or XLS file
-
-		return XLSX.utils.sheet_to_json(XLSX.readFile(file).Sheets[sheet], options);
+    const readFile = XLSX.readFile(file).Sheets[sheet];
+    // console.log('readFile', readFile)
+		return XLSX.utils.sheet_to_json(readFile, options);
 	},
 	async csvToJSON(file) {
 		// Don't interpret dots (.) and square brackets in header fields as nested object or array identifiers at all (treat them like regular characters for JSON field identifiers)
@@ -77,6 +79,10 @@ const initialMethods = {
 		switch (type) {
 			case 'str':
 				const str = val.toString();
+
+        if (str === 'HUD HOME') {
+          return 'HOME'
+        };
 				// Front end hardcoded options for Development Type in map filter are: New Construction, Rehab, Acquisition/Rehab, Rehabilitation -- this should be cleaned up
 				// Cases not met: 'Rehab/Preservation', 'Acquisition', 'Acquisition New Construction',
 
@@ -114,10 +120,13 @@ const initialMethods = {
 
     // CONVERVERTES AND OVERWRITERS
     if (this.agencyName === 'Georgia Department of Community Affairs' && type === 'Subsidy') {
-      if (item[mapping['low_income_units']]) {
+      if (obj?.[mapping['low_income_units']] === '') {
         const lowIncomeUnits = item[mapping['low_income_units']].split(' ')[0]
         obj['low_income_units'] = lowIncomeUnits;
       }
+
+      obj['target_population'] = obj?.['target_population']?.split(' ').reverse()?.[0] || '';
+
       
       // const dateValue = item[mapping['risk_of_exp']] 
       //   ? this.handleDate(item[mapping['risk_of_exp']]) 
@@ -126,8 +135,16 @@ const initialMethods = {
       const endDate = item[mapping['end_date']]
       const riskDate = item[mapping['risk_of_exp']]
 
+      if (item[mapping['funding_sources']] === 'HUD HOME') {
+        obj['funding_sources'] = 'HOME'; 
+      }
+
       if (item[mapping['funding_sources']] === 'LIHTC') {
-        obj['risk_of_exp'] = riskDate ? new Date(riskDate) : null;
+        obj['risk_of_exp'] = riskDate 
+          ? new Date(riskDate) 
+          : startDate
+          ? new Date(moment(new Date(startDate)).add(15, 'years').subtract(1, 'day').format('M/D/YYYY'))
+            : null;
         obj['start_date'] = startDate 
           ? new Date(startDate) 
           : riskDate 
@@ -147,9 +164,7 @@ const initialMethods = {
         obj['end_date'] = endDate ? new Date(endDate) : null;
         obj['risk_of_exp'] = null;
       }
-      
-      obj['target_population'] = item?.['target_population']?.split(' ').reverse()?.[0] || '';
-      obj['funding_sources'] = 'LIHTC'
+            // obj['funding_sources'] = 'LIHTC'
     }
     if (this.agencyName === 'Atlanta Housing' && type === 'Subsidy'){
 			obj['funding_sources'] = 'HomeFlex';
@@ -176,17 +191,17 @@ module.exports = {
 	DCA: {
 		...initialMethods,
 		agencyName: 'Georgia Department of Community Affairs',
-		cityKey: 'Project City',
-		fundingSrcNameKey: 'Project Funding Source',
+		// cityKey: 'Project City',
+		fundingSrcNameKey: 'Project Funding Source_1',
 		acceptedFundingSrc: [
       // FOR LIHTC
-      'LIHTC', 
-      'LIHTC & HUD HOME', 
-      'LIHTC & Tax Credit Assistance Program',
-      'LIHTC & Exchange (1602)'
+      // 'LIHTC', 
+      // 'LIHTC & HUD HOME', 
+      // 'LIHTC & Tax Credit Assistance Program',
+      // 'LIHTC & Exchange (1602)'
       // FOR HUD HOME
       // 'LIHTC & HUD HOME', 
-      // 'HUD HOME',
+      'HUD HOME',
       // 'HUD HOME, Housing Trust Fund, Tax Credit Assistance Program',
       // 'Tax Credit Assistance Program & HUD HOME',
       // 'HUD HOME & Tax Credit Assistance Program'
@@ -194,14 +209,18 @@ module.exports = {
     ],
 		xlsxRange: 0,
 		preFilter(obj) {
-			if (obj[this.fundingSrcNameKey] && obj[this.cityKey])
-				return helpers.filterByCityAndAcceptedFundingArr({
-					cityVal: obj[this.cityKey].toUpperCase(),
-					fundingVal: obj[this.fundingSrcNameKey],
-					acceptedFundingArr: this.acceptedFundingSrc
-				});
-			else if (obj[this.cityKey])
-				return obj[this.cityKey].match(/atlanta/i);
+      
+      if (this.acceptedFundingSrc.includes(`${obj[this.fundingSrcNameKey]}`.trim())) {
+        return true;
+      }
+			// if (obj[this.fundingSrcNameKey] && obj[this.cityKey])
+			// 	return helpers.filterByCityAndAcceptedFundingArr({
+			// 		cityVal: obj[this.cityKey].toUpperCase(),
+			// 		fundingVal: obj[this.fundingSrcNameKey],
+			// 		acceptedFundingArr: this.acceptedFundingSrc
+			// 	});
+			// else if (obj[this.cityKey])
+			// 	return obj[this.cityKey].match(/atlanta/i);
 
 			return false;
 		}

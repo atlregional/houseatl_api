@@ -7,8 +7,8 @@ const db = require('../../models');
 const handleNewRecord = async ({
   newSubsidy,
   propertyId,
-  newFundingSrc,
-  newResidentArr,
+  // newFundingSrc,
+  // newResidentArr,
   userId,
   agencyId,
   uploadId
@@ -18,7 +18,7 @@ const handleNewRecord = async ({
       ...newSubsidy,
       property_id: propertyId,
       user_id: userId,
-      funding_sources: '',
+      // funding_sources: '',
       agency_id: agencyId,
       uploads: [uploadId],
       deduplicated_subsidies: []
@@ -29,36 +29,36 @@ const handleNewRecord = async ({
       { $push: { subsidies: dbSubsidy._id } }
     );
 
-    for await (const source of Object.values(newFundingSrc)) {
-      if (source) {
-        const dbFundingSource = await db.FundingSource.create({
-          source: source,
-          subsidy_id: dbSubsidy._id,
-          user_id: userId,
-          agency_id: agencyId,
-          uploads: [uploadId]
-        });
+    // for await (const source of Object.values(newFundingSrc)) {
+    //   if (source) {
+    //     const dbFundingSource = await db.FundingSource.create({
+    //       source: source,
+    //       subsidy_id: dbSubsidy._id,
+    //       user_id: userId,
+    //       agency_id: agencyId,
+    //       uploads: [uploadId]
+    //     });
 
-        await db.Subsidy.updateOne(
-          { _id: dbSubsidy._id },
-          {
-            $push: { funding_sources: dbFundingSource._id }
-          }
-        );
-      }
-    }
+    //     await db.Subsidy.updateOne(
+    //       { _id: dbSubsidy._id },
+    //       {
+    //         $push: { funding_sources: dbFundingSource._id }
+    //       }
+    //     );
+    //   }
+    // }
 
-    for await (const item of newResidentArr) {
-      if (item || item.toUpperCase() !== 'RENTER') {
-        await db.Resident.create({
-          type: item,
-          subsidy_id: dbSubsidy._id,
-          user_id: userId,
-          agency_id: agencyId,
-          uploads: [uploadId]
-        });
-      }
-    }
+    // for await (const item of newResidentArr) {
+    //   if (item || item.toUpperCase() !== 'RENTER') {
+    //     await db.Resident.create({
+    //       type: item,
+    //       subsidy_id: dbSubsidy._id,
+    //       user_id: userId,
+    //       agency_id: agencyId,
+    //       uploads: [uploadId]
+    //     });
+    //   }
+    // }
   } catch (err) {
     console.log(err);
   }

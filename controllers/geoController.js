@@ -18,7 +18,7 @@ module.exports = {
           tracts: 'geojsons/ATL_Tracts.json',
           cities: 'geojsons/Cities_Georgia.json',
           beltline: 'geojsons/Beltline_Trails.json',
-          counties: 'geojsons/5CoreCounties.json',
+          counties: 'geojsons/5CorerCounties.json',
           // schooldistricts: 'geojsons/5CountySchoolDistricts.json',
 
           // Data Lyers

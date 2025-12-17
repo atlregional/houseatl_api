@@ -69,6 +69,7 @@ const init = async ({ directory, filename, sheet, user }) => {
           ? await agencyObj.excelToJSON(path, sheet)
           : [];
 
+    console.log('Data:', data)
     if (!data[0]) {
       console.log('No data detected from file:', filename);
       process.exit(1);
